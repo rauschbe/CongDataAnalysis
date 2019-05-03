@@ -24,7 +24,7 @@ import pydot
 
 
 
-def read_in_data(output = True, wdir = '/Users/benni/Desktop/Uni/Paper/Einsman/'):
+def read_in_data(output = True, wdir = '/Users/benni/Desktop/Uni/Paper/Einsman/', o_ava = False, o_edi = False, o_shn = False, o_bag = False):
     """
     reads in data from saved and downloaded Einsman-csv files for ava and edi
     can be easily appened in the same manner for all other downloaded data
@@ -45,57 +45,61 @@ def read_in_data(output = True, wdir = '/Users/benni/Desktop/Uni/Paper/Einsman/'
     complete_bag = pd.DataFrame()
     os.chdir(wdir)
     i = 0
-    for f in sorted(ava):
-        data = pd.read_csv(f, encoding = 'utf-8')
-        data.rename(columns = {'Anlagenschlüssel':'Anlagenschluessel', 'Entschädigungspflicht':'Entschaedigungspflicht'}, inplace = True)
-        data['Start'] = pd.to_datetime(data['Start'])
-        data['Time (CET)'] = data['Start']
-        complete_ava = complete_ava.append(data)
-        print('Iteration: ',i)
-        i = i + 1
-    i = 0
-    if output:
-        complete_ava.to_csv('ava.csv', index=False)
+    if o_ava:
+        for f in sorted(ava):
+            data = pd.read_csv(f, encoding = 'utf-8')
+            data.rename(columns = {'Anlagenschlüssel':'Anlagenschluessel', 'Entschädigungspflicht':'Entschaedigungspflicht'}, inplace = True)
+            data['Start'] = pd.to_datetime(data['Start'])
+            data['Time (CET)'] = data['Start']
+            complete_ava = complete_ava.append(data)
+            print('Iteration: ',i)
+            i = i + 1
+        if output:
+            complete_ava.to_csv('ava.csv', index=False)
+    if o_edi:
+        i = 0
+        for f in sorted(edi):
+            data = pd.read_csv(f, encoding = 'utf-8')
+            data.rename(columns = {'Anlagenschlüssel':'Anlagenschluessel', 'Entschädigungspflicht':'Entschaedigungspflicht'}, inplace = True)
+            data['Start'] = pd.to_datetime(data['Start'])
+            data['Time (CET)'] = data['Start']
+            data['Dauer(min)'] = data['Dauer(min)'].astype(int)
+            complete_edi = complete_edi.append(data)
+            print('Iteration: ',i)
+            i = i + 1
+        if output:
+            complete_edi.to_csv('edi.csv', index = False)
 
-    for f in sorted(edi):
-        data = pd.read_csv(f, encoding = 'utf-8')
-        data.rename(columns = {'Anlagenschlüssel':'Anlagenschluessel', 'Entschädigungspflicht':'Entschaedigungspflicht'}, inplace = True)
-        data['Start'] = pd.to_datetime(data['Start'])
-        data['Time (CET)'] = data['Start']
-        data['Dauer(min)'] = data['Dauer(min)'].astype(int)
-        complete_edi = complete_edi.append(data)
-        print('Iteration: ',i)
-        i = i + 1
-    if output:
-        complete_edi.to_csv('edi.csv', index = False)
+    if o_shn:
+        i = 0
+        for f in sorted(shn):
+            data = pd.read_csv(f, encoding='utf-8')
+            data.rename(
+                columns={'Anlagenschlüssel': 'Anlagenschluessel', 'Entschädigungspflicht': 'Entschaedigungspflicht'},
+                inplace=True)
+            data['Start'] = pd.to_datetime(data['Start'])
+            data['Time (CET)'] = data['Start']
+            complete_shn = complete_shn.append(data)
+            print('Iteration: ', i)
+            i = i + 1
 
-    i = 0
-    for f in sorted(shn):
-        data = pd.read_csv(f, encoding='utf-8')
-        data.rename(
-            columns={'Anlagenschlüssel': 'Anlagenschluessel', 'Entschädigungspflicht': 'Entschaedigungspflicht'},
-            inplace=True)
-        data['Start'] = pd.to_datetime(data['Start'])
-        data['Time (CET)'] = data['Start']
-        complete_shn = complete_shn.append(data)
-        print('Iteration: ', i)
-        i = i + 1
+        if output:
+            complete_shn.to_csv('shn.csv', index = False)
 
-    if output:
-        complete_shn.to_csv('shn.csv', index = False)
-    i = 0
-    for f in sorted(bag):
-        data = pd.read_csv(f, encoding='utf-8')
-        data.rename(
-            columns={'Anlagenschlüssel': 'Anlagenschluessel', 'Entschädigungspflicht': 'Entschaedigungspflicht'},
-            inplace=True)
-        data['Start'] = pd.to_datetime(data['Start'])
-        data['Time (CET)'] = data['Start']
-        complete_bag = complete_bag.append(data)
-        print('Iteration: ', i)
-        i = i + 1
-    if output:
-        complete_bag.to_csv('bag.csv', index = False)
+    if o_bag:
+        i = 0
+        for f in sorted(bag):
+            data = pd.read_csv(f, encoding='utf-8')
+            data.rename(
+                columns={'Anlagenschlüssel': 'Anlagenschluessel', 'Entschädigungspflicht': 'Entschaedigungspflicht'},
+                inplace=True)
+            data['Start'] = pd.to_datetime(data['Start'])
+            data['Time (CET)'] = data['Start']
+            complete_bag = complete_bag.append(data)
+            print('Iteration: ', i)
+            i = i + 1
+        if output:
+            complete_bag.to_csv('bag.csv', index = False)
     return complete_ava, complete_edi, complete_shn, complete_bag
 
 def edit_data(complete_ava, complete_edi, output = False):
