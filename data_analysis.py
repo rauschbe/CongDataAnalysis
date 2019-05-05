@@ -1,4 +1,10 @@
-def descriptor_einsman(df, name = "no name defined"):
+import pandas as pd
+def descriptor_einsman(df, name = "no name defined", limited = True):
+    df['Time (CET)'] = pd.to_datetime(df['Time (CET)'], utc = True)
+    df['Time (CET)'] = df['Time (CET)']
+    df.sort_values(by = 'Time (CET)', inplace = True)
+    if limited:
+        df = df[(df['Time (CET)'].dt.year < 2018)]
     col_list = ['ID', 'Einsatz-ID', 'Dauer(min)', 'Gebiet',
                 'Ort Engpass', 'Stufe(%)', 'Ursache', 'Anlagenschluessel', 'Anforderer',
                 'Netzbetreiber', 'Anlagen-ID', 'Entschaedigungspflicht', 'Time (CET)']
