@@ -20,6 +20,8 @@ Starting date 0    2016-09-30 13:58:41+02:00
 Name: Time (CET), dtype: object
 Ending date 31460    2017-06-27 13:56:54+02:00
 Name: Time (CET), dtype: object
+finished processing of Bayernwerke AG 
+
 ---------------------------------------
 Length of ID 698439
 Length of Einsatz-ID 19831
@@ -53,6 +55,8 @@ Starting date 0    2016-02-02 00:58:18+01:00
 Name: Time (CET), dtype: object
 Ending date 698438    2016-05-11 10:34:09+02:00
 Name: Time (CET), dtype: object
+finished processing of EDI.S Netz 
+
 ---------------------------------------
 Length of ID 1773911
 Length of Einsatz-ID 50967
@@ -75,6 +79,8 @@ Starting date 0    2016-12-14 18:12:02+01:00
 Name: Time (CET), dtype: object
 Ending date 1773910    2016-12-19 09:15:20+01:00
 Name: Time (CET), dtype: object
+finished processing of Schleswig-Holstein Netz 
+
 ---------------------------------------
 Length of ID 232841
 Length of Einsatz-ID 2727
@@ -175,3 +181,5 @@ Starting date 0    2018-07-12 17:32:03+02:00
 Name: Time (CET), dtype: object
 Ending date 232840    2018-09-26 09:06:27+02:00
 Name: Time (CET), dtype: object
+finished processing of Avacon Netz 
+

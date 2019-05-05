@@ -17,5 +17,6 @@ def descriptor_einsman(df, name = "no name defined"):
             print('Min Dauer', df[i].min())
         else:
             print('Length of {}'.format(i), len(df[i].unique()))
-    return "finished processing of {} \n".format(name)
+    print("finished processing of {} \n".format(name))
+    return
 
