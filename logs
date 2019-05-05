@@ -1,0 +1,177 @@
+Length of ID 31461
+Length of Einsatz-ID 849
+Durchschnittliche Dauer 134.43482406789357
+Median Dauer 45.0
+Std Dauer 1098.2825890933618
+Max Dauer 155505
+Min Dauer 1
+Length of Gebiet 961
+Length of Ort Engpass 156
+Unique values of Stufe(%) [ 0 60 30]
+Unique values of Ursache ['Netzengpass' 'Funktionsnachweis' 'Vorg.Netzbetreiber' 'Netzstörung'
+ 'Funktionstest' 'Fonktionsnachweis' 'Funktiosnachweis' 'Test']
+Length of Anlagenschluessel 10259
+Unique values of Anforderer ['Bayernwerk' 'Tennet' nan]
+Unique values of Netzbetreiber ['Bayernwerk' 'SGG Germering' nan 'EVG Energieversorgung Gemünden'
+ 'Stromnetz WD' 'Energieversorgung Pfaffenhofen GmbH']
+Length of Anlagen-ID 8001
+Unique values of Entschaedigungspflicht ['EnWG' 'EEG']
+Starting date 0    2016-09-30 13:58:41+02:00
+Name: Time (CET), dtype: object
+Ending date 31460    2017-06-27 13:56:54+02:00
+Name: Time (CET), dtype: object
+---------------------------------------
+Length of ID 698439
+Length of Einsatz-ID 19831
+Durchschnittliche Dauer 224.6293119370482
+Median Dauer 105.0
+Std Dauer 363.4001987204981
+Max Dauer 24923
+Min Dauer 0
+Length of Gebiet 160
+Length of Ort Engpass 1111
+Unique values of Stufe(%) [ 30   0 100  60]
+Unique values of Ursache ['Netzengpass' 'EnWg § 13.2' 'ÜNB Netzengpass'
+ 'lt. Anforderung WEMAG EnWG 13.2a' 'Wartung / IH' 'EnWG §\xa0 13.2'
+ 'Verletzung n-1 Kriterium' 'Netzengpass WEMAG' 'Wartung/Instandhaltung'
+ 'EEG § 14' 'EnWg § 13.3' 'Spitzenkappung' 'Störung' 'SW PRL Netzengpass '
+ 'EEG-bed. Netzausbau' 'Netzengpass SW PRL' 'Netzenpass' 'ungültig'
+ 'EnWG § 13.2' 'SW PRL Netzengpass' 'Wartung Instandhaltung'
+ 'Netzengpass ' 'Wartung und IH' 'EDI Netzengpass'
+ 'Wartung/IH lt. Abschaltplanung' 'Netzengpass Spika' 'Engpass'
+ 'EDI Wartung / Instandhaltung lt. Wochenabschaltplanung'
+ 'EDI Wartung / Instandhaltung lt. Abschaltplanung'
+ 'Störung  110 kV Erdschluss' 'Gefahr im Verzug Waldbrandstufe 5'
+ 'planmäßige Schaltung' 'Wartung u. Instandhaltung WEMAG --> EDI  (E SSM)'
+ 'Störung Leitsystem, EDI' 'Störung Leitsystem EDI']
+Length of Anlagenschluessel 4187
+Unique values of Anforderer ['E.DIS AG' 'ÜNB 50Hertz' 'WEMAG' 'E.DIS Netz GmbH' 'SW Prenzlau']
+Unique values of Netzbetreiber ['E.DIS AG' 'E.DIS Netz GmbH' 'SW Prenzlau' 'NG FFO']
+Length of Anlagen-ID 959
+Unique values of Entschaedigungspflicht ['EEG' 'EnWG']
+Starting date 0    2016-02-02 00:58:18+01:00
+Name: Time (CET), dtype: object
+Ending date 698438    2016-05-11 10:34:09+02:00
+Name: Time (CET), dtype: object
+---------------------------------------
+Length of ID 1773911
+Length of Einsatz-ID 50967
+Durchschnittliche Dauer 511.5503212957133
+Median Dauer 196.0
+Std Dauer 958.9712409541595
+Max Dauer 40394
+Min Dauer 0
+Length of Gebiet 1004
+Length of Ort Engpass 1046
+Unique values of Stufe(%) [  0  30  60 100]
+Unique values of Ursache ['Netzengpass' '1062' '1098' ... '0632' '0522' '1111']
+Length of Anlagenschluessel 5761
+Unique values of Anforderer ['9900535000007' '4033872000058' '4050404000003' 'no ILN Number'
+ '403erer000058' 'EEG']
+Unique values of Netzbetreiber [9900535000007 9906977000001 9900470000005 9906392000008 9900310000008]
+Length of Anlagen-ID 3103
+Unique values of Entschaedigungspflicht ['EEG' 'EnWG']
+Starting date 0    2016-12-14 18:12:02+01:00
+Name: Time (CET), dtype: object
+Ending date 1773910    2016-12-19 09:15:20+01:00
+Name: Time (CET), dtype: object
+---------------------------------------
+Length of ID 232841
+Length of Einsatz-ID 2727
+Durchschnittliche Dauer 247.29403326733694
+Median Dauer 71.0
+Std Dauer 603.412819655914
+Max Dauer 65052
+Min Dauer -1
+Length of Gebiet 436
+Length of Ort Engpass 287
+Unique values of Stufe(%) [  0  30  60  50 100  80  23  81  68  67  65  79  82  83  90  69  71  59
+  61  64  66  62  58  70  77  52  53  54  55  56  57  63  84  78  86  85
+  88  89  91  93  92  72  76  74  75  87  73]
+Unique values of Ursache ['Netzengpass' 'Test' 'Vorgelagerter Netzbetreiber' 'VOSLAPP        T212'
+ '110-kV-Hohenkirchen-Voslapp-BLAU,Hooksiel' 'EMDEN/BORS     T211'
+ '110-kV-Roffhausen-Burhafe-ROT' '110-kV-Emden/W-Manslagt-Weiss,Jennelt'
+ '110-kV-Emden/Borssum-Wiesmoor-ROT,Ihlow,Bagband'
+ '110-kV-Varel-Roffhausen-GELB' '110-kV-Sulingen-Bassum-1,Anstedt,Scholen'
+ '110-kV-Esens-Westeraccum-GELB,Damsum,Schwittersum'
+ 'Geplante Einspeiseunterbrechung'
+ 'VOSLAPP        T211                                                    @NKD: 220kV-Le-TN-Ol'
+ 'EMDEN/BORS     T211                                                    @NKD: 220kV-Le-TN-Ol'
+ 'BRAUNSCHWE     T211' '110-kV-Hohenkirchen-Voslapp-BLAU'
+ '110-kV-Conneforde-Roffhausen-BLAU, Bockhorn'
+ '110-kV-Elsen-Paderborn/S-4-5-3,Salzkotten,Paderborn/W'
+ '110-kV-Hänigsen-Peine/Ost-3,Oelerse,Edemissen' 'LEHRTE         T213'
+ '110-kV-Paderborn/S-Paderborn/W-3' '110-kV-Ohlensehlen-Sulingen-4'
+ 'Funktionsnachweis' 'CONNEFORDE     T411' 'Hohe Netzauslastung'
+ '110-kV-Ohlensehlen-Sulingen-1' '110-kV-Halbemond-Norddeich-Schwarz'
+ '110-kV-Emden/W-Marienhafe-SCHWARZ,Eilsum,Hinte'
+ 'VOSLAPP        T212                                                    @NKD: 220kV-Le-TN-Ol'
+ '110-kV-Halbemond-Lütetsburg-Blau' 'CLOPPENBUR     T211'
+ '110-kV-Ganderkesee-Visbek-GRUEN,Simmerhausen,Dötlingen'
+ 'WECHOLD        T212' 'LEHRTE         T214'
+ '110-kV-Dinklage-Essen-ROT,Wulfenau'
+ '110-kV-Ohlensehlen-Wechold-2,Kuppendorf,Siedenburg,Hoya' 'Netzstoerung'
+ '110-kV-Roffhausen-Jever-GRUEN'
+ '110-kV-Sulingen-Wechold-2,Siedenburg,Hoya'
+ '110-kV-Esens-Norddeich-GRÜN,Schwittersum/Süd,Hagermarsch,Hage/Nord,Junkersrott'
+ 'EMDEN/BORS     T212' '110-kV-Jever-Halbemond-GELB,Holtriem,Neuschoo'
+ '110-kV-Halbemond-Manslagt-Blau,Eilsum'
+ '110-kV-Halbemond-Marienhafe-Gelb' '110-kV-Norddeich-Lütetsburg-WEISS'
+ 'CONNEFORDE     T411                                                    @NKD: 380kV-Le-TN-Ol'
+ '110-kV-Halbemond-Lütetsburg-Blau@NKD: 110kV-Ol-TN-Ol'
+ 'DIELE          T411                                                    @NKD: 380kV-Le-TN-Ol'
+ 'hohe Netzauslastung'
+ '110-kV-Conneforde-Wiesmoor-GELB,Neuenburg,Bentstreek'
+ '110-kV-Ohlensehlen-Sulingen-1,Kirchdorf,Kuppendorf'
+ '110-kV-Conneforde-Roffhausen-BLAU, Bockhorn@NKD: 110kV-Ol-TN-Ol'
+ 'VOSLAPP        T211'
+ '110-kV-Friesoythe-Oldenburg/W-BLAU,Friesoythe/Ost,Oberlethe'
+ '110-kV-Sehnde-Peine/W-2,Mehrum,Schwicheldt,Nettlingen'
+ '110-kV-Hohenkirchen-Voslapp-BLAU@NKD: 110kV-Ol-TN-Ol'
+ '110-kV-Sottrum-Weyhe-Schwarz,Etelsen,Oyten@NKD: 110kV-Le-TN-1'
+ 'CONNEFORDE     T212                                                    @NKD: 220kV-Le-TN-Ol'
+ '110-kV-Halbemond-Norddeich-Schwarz@NKD: 110kV-Ol-TN-Ol'
+ 'WECHOLD        T212                                                    @NKD: 220kV-Le-TN-Le'
+ '110-kV-Emden/W-Manslagt-Weiss,Jennelt@NKD: 110kV-Ol-TN-Ol'
+ '110-kV-Emden/W-Marienhafe-SCHWARZ,Eilsum'
+ '60-kV-Oldau-Bergen-1,Bergen/Süd'
+ '110-kV-Wechold-Düshorn-1,Dörverden,Thransheide'
+ '110-kV-Conneforde-Wiesmoor-ROT,Neuenburg,Wiesmoor/Süd'
+ '110-kV-Emden/Borssum-Wiesmoor-ROT,Ihlow,Bagband,Simonswolde'
+ '110-kV-Lindern-Papenburg-GELB,Esterwegen121,Esterwegen122,Lorup@NKD: 110kV-Ol-TN-Ol'
+ '110-kV-Esens-Westeraccum-GELB,Damsum,Schwittersum@NKD: 110kV-Ol-TN-Ol'
+ 'NIEDERLANG     T411'
+ 'ALFSTEDT       T411                                                    @NKD: 380kV-Le-TN-Ol'
+ '110-kV-Esens-Hohenkirchen-ROT' '110-kV-Wechold-Eitze-3'
+ '110-kV-Burhafe-Halbemond-GRUEN,Holtriem/N,Arle'
+ '110-kV-Conneforde-Varel-WEISS'
+ '110-kV-Dinklage-Essen-ROT,Wulfenau@NKD: 110kV-Ol-TN-Ol'
+ '110-kV-Cloppenburg/O-Cloppenburg/W-WEISS'
+ '110-kV-Carolinensiel-Voslapp-GRUEN' 'SOTTRUM        T413'
+ 'OHLENSEHLE     T411'
+ 'Verletzung (n-1) Versorgungssicherheit nach Störung im UW Rehburg am Trafo 101'
+ '110-kV-Halbemond-Manslagt-Blau'
+ '110-kV-Wiesmoor-Aurich-GRÜN,Spetzerfehn'
+ '110-kV-Alfstedt-Surheide-ROT,Bederkesa' '110-kV-Papenburg-Dörpen-GELB'
+ 'DIELE          T412                                                    @NKD: 380kV-Le-TN-Ol'
+ '110-kV-Cloppenburg/O-Cloppenburg/W-WEISS@NKD: 110kV-Ol-TN-Ol'
+ '110-kV-Sulingen-Bassum-2,Anstedt,Blockwinkel,Wedehorn'
+ '110-kV-Bassum-Ohlensehlen-1,Scholen,Anstedt'
+ '110-kV-Düshorn-Oldau-1,Marklendorf'
+ '110-kV-Visselhövede-Schneverdingen-GRUEN,Bomlitz,Söhlingen'
+ '110-kV-Stadorf-Wieren-1,Uelzen' '110-kV-Sottrum-Eitze-ROT/1,Maulhoop'
+ '110-kV-Emden/Borssum-Aurich-GELB,Ihlow' 'WECHOLD        T211'
+ '110-kV-Lindern-Papenburg-GELB,Esterwegen121,Esterwegen122,Lorup'
+ '110-kV-Oldau-Bostel-2']
+Length of Anlagenschluessel 5536
+Unique values of Anforderer ['9907137000005' '9907492000005' 'Avacon' '50 Hertz' 'Tennet'
+ '4033872000058' '9907337000003' 'HSN' 'TenneT' '9907137000005.0'
+ '4033872000058.0' '9907492000005.0' nan]
+Unique values of Netzbetreiber ['Avacon Netz GmbH' 'Avacon AG' '9907137000005' nan
+ 'Stadtwerke Haldensleben GmbH']
+Length of Anlagen-ID 6986
+Unique values of Entschaedigungspflicht ['EEG' 'EnWG']
+Starting date 0    2018-07-12 17:32:03+02:00
+Name: Time (CET), dtype: object
+Ending date 232840    2018-09-26 09:06:27+02:00
+Name: Time (CET), dtype: object
