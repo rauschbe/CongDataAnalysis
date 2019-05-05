@@ -29,11 +29,26 @@ def descriptor_einsman(df, name = "no name defined", limited = True):
     return
 
 
-def filter_tso(df, tso = 'none'):
-    if tso == 'none':
+def filter_tso(df, tso = 'none', limited = True, output = True, name = 'no_name'):
+    df['Time (CET)'] = pd.to_datetime(df['Time (CET)'], utc = True)
+    df['Time (CET)'] = df['Time (CET)']
+    df.sort_values(by = 'Time (CET)', inplace = True)
+    if limited:
+        df = df[(df['Time (CET)'].dt.year < 2018)]
+    if tso not in ['50 Hertz','50Hertz', 'TenneT', 'tennet']:
         print('No tso name given - no processing')
-    else:
-        df = df[df[df.Anforderer.str.contains(tso)]]
-
-    print('finished filtering of dataframe for TSO {}'.format(tso))
+    elif tso in ['50 Hertz','50Hertz']:
+        df.Anforderer = df.Anforderer.apply(str)
+        df = df[df.Anforderer.str.contains('Hertz')]
+        if output:
+            df.to_csv('/Users/benni/PycharmProjects/CongDataAnalysis/Filtered EinsManData/'+
+                      name + '_filtered_for_' + tso + '.csv', index = False)
+    elif tso == ['TenneT','tennet']:
+        df.Anforderer = df.Anforderer.apply(str)
+        df.Anforderer = df.Anforderer.replace(['4033872000058','4050404000003'], 'TenneT')
+        df = df[df.Anforderer.str.contains(tso)]
+        if output:
+            df.to_csv('/Users/benni/PycharmProjects/CongDataAnalysis/Filtered EinsManData/'+
+                      name + '_filtered_for_' + tso + '.csv', index = False)
+    print('finished filtering of dataframe {name} for TSO {tso}'.format(name = name,tso = tso))
     return df

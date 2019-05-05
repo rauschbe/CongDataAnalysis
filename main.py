@@ -13,8 +13,8 @@ shn = pd.read_csv('/Users/benni/Desktop/Uni/Paper/Einsman/shn.csv', low_memory =
 ava = pd.read_csv('/Users/benni/Desktop/Uni/Paper/Einsman/ava.csv', low_memory = False)
 
 if tso_filter:
-    edi = filter_tso(edi, tso = '50Hertz')
-    ava = filter_tso(ava, tso = '50Hertz')
+    edi = filter_tso(edi, tso = '50 Hertz', name = 'edi')
+    ava = filter_tso(ava, tso = '50 Hertz', name = 'ava')
 
 if description:
     descriptor_einsman(bag, name = 'Bayernwerke AG')
@@ -24,3 +24,8 @@ if description:
     descriptor_einsman(shn, name = 'Schleswig-Holstein Netz')
     print('---------------------------------------')
     descriptor_einsman(ava, name = 'Avacon Netz')
+
+
+##################
+
+#Redispatch
