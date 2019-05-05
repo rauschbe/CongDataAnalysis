@@ -1,4 +1,6 @@
 import pandas as pd
+
+
 def descriptor_einsman(df, name = "no name defined", limited = True):
     df['Time (CET)'] = pd.to_datetime(df['Time (CET)'], utc = True)
     df['Time (CET)'] = df['Time (CET)']
@@ -26,3 +28,12 @@ def descriptor_einsman(df, name = "no name defined", limited = True):
     print("finished processing of {} \n".format(name))
     return
 
+
+def filter_tso(df, tso = 'none'):
+    if tso == 'none':
+        print('No tso name given - no processing')
+    else:
+        df = df[df[df.Anforderer.str.contains(tso)]]
+
+    print('finished filtering of dataframe for TSO {}'.format(tso))
+    return df

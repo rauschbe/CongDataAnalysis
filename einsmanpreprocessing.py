@@ -20,7 +20,7 @@ from sklearn.metrics import precision_recall_fscore_support
 from sklearn.externals.six import StringIO
 import pydot
 
-#TODO mapping of Anforderer: 9900535000007(SHN), 4033872000058(TenneT),
+#TODO mapping of Anforderer: 9900535000007(SHN), 4033872000058(TenneT), 4050404000003 (TenneT ehemals E.ON Netz GmbH)
 
 
 
