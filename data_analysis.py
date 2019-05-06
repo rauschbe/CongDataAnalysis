@@ -1,6 +1,5 @@
 import pandas as pd
 
-
 def descriptor_einsman(df, name = "no name defined", limited = True):
     df['Time (CET)'] = pd.to_datetime(df['Time (CET)'], utc = True)
     df['Time (CET)'] = df['Time (CET)']
@@ -52,3 +51,12 @@ def filter_tso(df, tso = 'none', limited = True, output = True, name = 'no_name'
                       name + '_filtered_for_' + tso + '.csv', index = False)
     print('finished filtering of dataframe {name} for TSO {tso}'.format(name = name,tso = tso))
     return df
+
+
+def read_in_redispatch_data(filter = 'none'):
+    redispatch_data = pd.read_csv('/Users/benni/PycharmProjects/CongDataAnalysis/redispatch/redispatch/redispatch_daten.csv',
+                        encoding='ISO-8859-1', sep=None, engine='python')
+    if filter != 'none':
+        print('Data is filtered for TSO {}'.format(filter))
+
+    return redispatch_data

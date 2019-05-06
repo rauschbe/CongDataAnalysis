@@ -3,8 +3,8 @@ import pandas as pd
 
 ########Variables
 description = False
-tso_filter = True
-
+tso_filter = False
+redispatch_filter = True
 
 #################
 bag = pd.read_csv('/Users/benni/Desktop/Uni/Paper/Einsman/bag.csv', low_memory = False)
@@ -28,4 +28,6 @@ if description:
 
 ##################
 
-#Redispatch
+if redispatch_filter:
+    redispatch_data = read_in_redispatch_data()
+    print(redispatch_data.columns)
