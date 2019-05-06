@@ -53,10 +53,29 @@ def filter_tso(df, tso = 'none', limited = True, output = True, name = 'no_name'
     return df
 
 
-def read_in_redispatch_data(filter = 'none'):
-    redispatch_data = pd.read_csv('/Users/benni/PycharmProjects/CongDataAnalysis/redispatch/redispatch/redispatch_daten.csv',
+def read_in_redispatch_data(filter = 'none', split = True):
+    redispatch = pd.read_csv('/Users/benni/PycharmProjects/CongDataAnalysis/redispatch/redispatch/redispatch_netztransparenz.csv',
                         encoding='ISO-8859-1', sep=None, engine='python')
+    redispatch = redispatch.loc[:, ~redispatch.columns.str.contains('^Unnamed')]
+    redispatch['Begin Time (CET)'] = pd.to_datetime(redispatch['BEGINN_DATUM'] + ' ' + redispatch['BEGINN_UHRZEIT'],
+                                                    errors = 'ignore')
+    redispatch['End Time (CET)'] = pd.to_datetime(redispatch['ENDE_DATUM'] + ' ' + redispatch['ENDE_UHRZEIT'],
+                                                  errors = 'ignore')
+
+    redispatch['Duration'] = redispatch['End Time (CET)'] - redispatch['Begin Time (CET)']
+    if split:
+        redispatch['RICHTUNG'] = redispatch['RICHTUNG'].replace('Wirkleistungseinspeisung reduzieren',
+                                                            'decrease')
+        redispatch['RICHTUNG'] = redispatch['RICHTUNG'].str.replace(r'(^.*Wirk.*)',
+                                                                'increase')
+
+
     if filter != 'none':
         print('Data is filtered for TSO {}'.format(filter))
+    else:
+        print('Data has not been filtered')
 
-    return redispatch_data
+    return redispatch
+
+def descriptor_redispatch(f):
+    return
