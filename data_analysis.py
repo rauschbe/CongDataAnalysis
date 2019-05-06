@@ -53,29 +53,38 @@ def filter_tso(df, tso = 'none', limited = True, output = True, name = 'no_name'
     return df
 
 
-def read_in_redispatch_data(filter = 'none', split = True):
-    redispatch = pd.read_csv('/Users/benni/PycharmProjects/CongDataAnalysis/redispatch/redispatch/redispatch_netztransparenz.csv',
+def read_in_redispatch_data(filter = 'none', split = True, translate = True, output = True):
+    time_frame = pd.DataFrame()
+    time_frame['Begin Time (CET)'] = pd.date_range(start='2015-01-01', end='2017-12-31 23:59:59', freq='H')
+    redispatch = pd.read_csv('/Users/benni/PycharmProjects/CongDataAnalysis/redispatch_data/redispatch_netztranparenz.csv',
                         encoding='ISO-8859-1', sep=None, engine='python')
     redispatch = redispatch.loc[:, ~redispatch.columns.str.contains('^Unnamed')]
-    redispatch['Begin Time (CET)'] = pd.to_datetime(redispatch['BEGINN_DATUM'] + ' ' + redispatch['BEGINN_UHRZEIT'],
-                                                    errors = 'ignore')
-    redispatch['End Time (CET)'] = pd.to_datetime(redispatch['ENDE_DATUM'] + ' ' + redispatch['ENDE_UHRZEIT'],
-                                                  errors = 'ignore')
-
-    redispatch['Duration'] = redispatch['End Time (CET)'] - redispatch['Begin Time (CET)']
+    redispatch['Beginn Zeit (CET)'] = pd.to_datetime(redispatch['BEGINN_DATUM'] + ' ' + redispatch['BEGINN_UHRZEIT'],
+                                                    errors = 'coerce')
+    redispatch['Ende Zeit (CET)'] = pd.to_datetime(redispatch['ENDE_DATUM'] + ' ' + redispatch['ENDE_UHRZEIT'],
+                                                  errors = 'coerce')
+    redispatch['Dauer'] = redispatch['Ende Zeit (CET)'] - redispatch['Beginn Zeit (CET)']
+    if translate:
+        redispatch.rename(columns = {
+       'NETZREGION':'Net_region', 'GRUND_DER_MASSNAHME':'Reason_for_measure', 'RICHTUNG':'Direction',
+        'MITTLERE_LEISTUNG_MW':'Mean_power_MW', 'MAXIMALE_LEISTUNG_MW':'MAX_POWER_MW',
+       'GESAMTE_ARBEIT_MWH':'TOTAL_WORK_MWH', 'ANWEISENDER_UENB':'DIRECTING_TSO',
+       'ANFORDERNDER_UENB':'REQUESTING_TSO', 'BETROFFENE_ANLAGE':'AFFECTED_PS', 'Redispatch_KW':'Redispatch_KW',
+        'Beginn Zeit (CET)':'Begin Time (CET)', 'Ende Zeit (CET)': 'End Time (CET)', 'Dauer':'Duration' }, inplace = True)
     if split:
-        redispatch['RICHTUNG'] = redispatch['RICHTUNG'].replace('Wirkleistungseinspeisung reduzieren',
+        redispatch['Direction'] = redispatch['Direction'].replace('Wirkleistungseinspeisung reduzieren',
                                                             'decrease')
-        redispatch['RICHTUNG'] = redispatch['RICHTUNG'].str.replace(r'(^.*Wirk.*)',
+        redispatch['Direction'] = redispatch['Direction'].str.replace(r'(^.*Wirk.*)',
                                                                 'increase')
-
-
-    if filter != 'none':
-        print('Data is filtered for TSO {}'.format(filter))
+    if filter in ['50Hertz', 'TenneT', 'TransnetBW', 'Amprion']:
+        redispatch = redispatch[redispatch['REQUESTING_TSO'].str.contains(filter)]
+        print('Data has been filtered for TSO {}'.format(filter))
     else:
         print('Data has not been filtered')
-
-    return redispatch
+    result = pd.merge(time_frame, redispatch,how='left', on=['Begin Time (CET)', 'Begin Time (CET)'])
+    if output:
+        result.to_csv('redispatch_data/Transformed_redispatch_data/redispatch_filtered_for_TSO_{}'.format(filter) + '.csv')
+    return result
 
 def descriptor_redispatch(f):
     return

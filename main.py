@@ -30,4 +30,3 @@ if description:
 
 if redispatch_filter:
     redispatch_data = read_in_redispatch_data()
-    print(redispatch_data.columns)
