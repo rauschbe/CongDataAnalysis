@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 
 def descriptor_einsman(df, name = "no name defined", limited = True):
     df['Time (CET)'] = pd.to_datetime(df['Time (CET)'], utc = True)
@@ -49,7 +50,7 @@ def filter_tso(df, tso = 'none', limited = True, output = True, name = 'no_name'
         if output:
             df.to_csv('/Users/benni/PycharmProjects/CongDataAnalysis/Filtered EinsManData/'+
                       name + '_filtered_for_' + tso + '.csv', index = False)
-    print('finished filtering of dataframe {name} for TSO {tso}'.format(name = name,tso = tso))
+    print('finished filtering of dataframe {name} for TSO {tso}'.format(name = name, tso = tso))
     return df
 
 
@@ -64,7 +65,15 @@ def read_in_redispatch_data(filter = 'none', split = True, translate = True, out
     redispatch['Ende Zeit (CET)'] = pd.to_datetime(redispatch['ENDE_DATUM'] + ' ' + redispatch['ENDE_UHRZEIT'],
                                                   errors = 'coerce', dayfirst = True)
     redispatch.drop(columns = ['BEGINN_DATUM','BEGINN_UHRZEIT','ENDE_DATUM', 'ENDE_UHRZEIT'])
+    redispatch = redispatch.dropna(subset=['Beginn Zeit (CET)', 'Ende Zeit (CET)'])
     redispatch['Dauer'] = redispatch['Ende Zeit (CET)'] - redispatch['Beginn Zeit (CET)']
+    redispatch['Dauer'] = round(redispatch['Dauer'] / np.timedelta64(1,'m'))
+    redispatch['Dauer'] = redispatch['Dauer'].fillna(0)
+    redispatch = redispatch[(redispatch.Dauer > 0)] #only include redispatch longer than one minute
+    redispatch['Dauer'] = redispatch['Dauer'].astype(int)
+    redispatch = redispatch.loc[redispatch.index.repeat(redispatch['Dauer'] + 1)]
+    redispatch['Beginn Zeit (CET)'] += pd.to_timedelta(redispatch.groupby(level=0).cumcount(), unit='s') * 3600
+    redispatch = redispatch.reset_index(drop=True)
     if translate:
         redispatch.rename(columns = {
        'NETZREGION':'Net_region', 'GRUND_DER_MASSNAHME':'Reason_for_measure', 'RICHTUNG':'Direction',

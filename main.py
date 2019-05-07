@@ -15,6 +15,8 @@ ava = pd.read_csv('/Users/benni/Desktop/Uni/Paper/Einsman/ava.csv', low_memory =
 if tso_filter:
     edi = filter_tso(edi, tso = '50 Hertz', name = 'edi')
     ava = filter_tso(ava, tso = '50 Hertz', name = 'ava')
+    shn = filter_tso(shn, tso = '50 Hertz', name = 'shn')
+    bag = filter_tso(bag, tso = '50 Hertz', name = 'bag')
 
 if description:
     descriptor_einsman(bag, name = 'Bayernwerke AG')
@@ -29,4 +31,4 @@ if description:
 ##################
 
 if redispatch_filter:
-    redispatch_data = read_in_redispatch_data()
+    redispatch_data = read_in_redispatch_data(filter = '50Hertz')
