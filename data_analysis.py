@@ -60,9 +60,10 @@ def read_in_redispatch_data(filter = 'none', split = True, translate = True, out
                         encoding='ISO-8859-1', sep=None, engine='python')
     redispatch = redispatch.loc[:, ~redispatch.columns.str.contains('^Unnamed')]
     redispatch['Beginn Zeit (CET)'] = pd.to_datetime(redispatch['BEGINN_DATUM'] + ' ' + redispatch['BEGINN_UHRZEIT'],
-                                                    errors = 'coerce')
+                                                    errors = 'coerce', dayfirst = True)
     redispatch['Ende Zeit (CET)'] = pd.to_datetime(redispatch['ENDE_DATUM'] + ' ' + redispatch['ENDE_UHRZEIT'],
-                                                  errors = 'coerce')
+                                                  errors = 'coerce', dayfirst = True)
+    redispatch.drop(columns = ['BEGINN_DATUM','BEGINN_UHRZEIT','ENDE_DATUM', 'ENDE_UHRZEIT'])
     redispatch['Dauer'] = redispatch['Ende Zeit (CET)'] - redispatch['Beginn Zeit (CET)']
     if translate:
         redispatch.rename(columns = {
@@ -80,11 +81,17 @@ def read_in_redispatch_data(filter = 'none', split = True, translate = True, out
         redispatch = redispatch[redispatch['REQUESTING_TSO'].str.contains(filter)]
         print('Data has been filtered for TSO {}'.format(filter))
     else:
-        print('Data has not been filtered')
+        print('Data has not been filtered or does not match needed filter')
     result = pd.merge(time_frame, redispatch,how='left', on=['Begin Time (CET)', 'Begin Time (CET)'])
     if output:
-        result.to_csv('redispatch_data/Transformed_redispatch_data/redispatch_filtered_for_TSO_{}'.format(filter) + '.csv')
+        result.to_csv('redispatch_data/Transformed_redispatch_data/redispatch_filtered_for_TSO_{}'.format(filter) + '.csv',
+                      index = False)
+        if split:
+            result[result['Direction'] == 'increase'].to_csv(
+                'redispatch_data/Transformed_redispatch_data/redispatch_filtered_for_TSO_{}_increase'.format(filter) + '.csv',
+                index=False)
+            result[result['Direction'] == 'decrease'].to_csv(
+                'redispatch_data/Transformed_redispatch_data/redispatch_filtered_for_TSO_{}_decrease'.format(
+                    filter) + '.csv', index=False)
     return result
 
-def descriptor_redispatch(f):
-    return
