@@ -1,6 +1,9 @@
 import pandas as pd
 import numpy as np
 
+
+
+
 def descriptor_einsman(df, name = "no name defined", limited = True):
     df['Time (CET)'] = pd.to_datetime(df['Time (CET)'], utc = True)
     df['Time (CET)'] = df['Time (CET)']
@@ -33,6 +36,7 @@ def filter_tso(df, tso = 'none', limited = True, output = True, name = 'no_name'
     df['Time (CET)'] = pd.to_datetime(df['Time (CET)'], utc = True)
     df['Time (CET)'] = df['Time (CET)']
     df.sort_values(by = 'Time (CET)', inplace = True)
+    df.drop(columns = ['ID', 'Einsatz-ID', 'Start', 'Ende', 'Anlagen-ID', 'Entschaedigungspflicht'], inplace = True)
     if limited:
         df = df[(df['Time (CET)'].dt.year < 2018)]
     if tso not in ['50 Hertz','50Hertz', 'TenneT', 'tennet']:
@@ -67,12 +71,12 @@ def read_in_redispatch_data(filter = 'none', split = True, translate = True, out
     redispatch.drop(columns = ['BEGINN_DATUM','BEGINN_UHRZEIT','ENDE_DATUM', 'ENDE_UHRZEIT'])
     redispatch = redispatch.dropna(subset=['Beginn Zeit (CET)', 'Ende Zeit (CET)'])
     redispatch['Dauer'] = redispatch['Ende Zeit (CET)'] - redispatch['Beginn Zeit (CET)']
-    redispatch['Dauer'] = round(redispatch['Dauer'] / np.timedelta64(1,'m'))
+    redispatch['Dauer'] = round(redispatch['Dauer'] / np.timedelta64(60,'m'))
     redispatch['Dauer'] = redispatch['Dauer'].fillna(0)
     redispatch = redispatch[(redispatch.Dauer > 0)] #only include redispatch longer than one minute
     redispatch['Dauer'] = redispatch['Dauer'].astype(int)
     redispatch = redispatch.loc[redispatch.index.repeat(redispatch['Dauer'] + 1)]
-    redispatch['Beginn Zeit (CET)'] += pd.to_timedelta(redispatch.groupby(level=0).cumcount(), unit='s') * 3600
+    redispatch['Beginn Zeit (CET)'] += pd.to_timedelta(redispatch.groupby(level=0).cumcount(), unit='h')
     redispatch = redispatch.reset_index(drop=True)
     if translate:
         redispatch.rename(columns = {
@@ -80,7 +84,7 @@ def read_in_redispatch_data(filter = 'none', split = True, translate = True, out
         'MITTLERE_LEISTUNG_MW':'Mean_power_MW', 'MAXIMALE_LEISTUNG_MW':'MAX_POWER_MW',
        'GESAMTE_ARBEIT_MWH':'TOTAL_WORK_MWH', 'ANWEISENDER_UENB':'DIRECTING_TSO',
        'ANFORDERNDER_UENB':'REQUESTING_TSO', 'BETROFFENE_ANLAGE':'AFFECTED_PS', 'Redispatch_KW':'Redispatch_KW',
-        'Beginn Zeit (CET)':'Begin Time (CET)', 'Ende Zeit (CET)': 'End Time (CET)', 'Dauer':'Duration' }, inplace = True)
+        'Beginn Zeit (CET)':'Begin Time (CET)', 'Ende Zeit (CET)': 'End Time (CET)', 'Dauer':'Duration_hour' }, inplace = True)
     if split:
         redispatch['Direction'] = redispatch['Direction'].replace('Wirkleistungseinspeisung reduzieren',
                                                             'decrease')
@@ -88,6 +92,7 @@ def read_in_redispatch_data(filter = 'none', split = True, translate = True, out
                                                                 'increase')
     if filter in ['50Hertz', 'TenneT', 'TransnetBW', 'Amprion']:
         redispatch = redispatch[redispatch['REQUESTING_TSO'].str.contains(filter)]
+        redispatch = redispatch.reset_index(drop=True)
         print('Data has been filtered for TSO {}'.format(filter))
     else:
         print('Data has not been filtered or does not match needed filter')

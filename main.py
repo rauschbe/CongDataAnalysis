@@ -31,4 +31,4 @@ if description:
 ##################
 
 if redispatch_filter:
-    redispatch_data = read_in_redispatch_data(filter = '50Hertz')
+    redispatch_data = read_in_redispatch_data()

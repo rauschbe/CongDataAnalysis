@@ -122,7 +122,7 @@ def edit_data(complete_ava, complete_edi, output = False):
     complete_ava['Dauer(min)'] = complete_ava['Dauer(min)'].fillna(0)
     complete_ava['Dauer(min)'] = complete_ava['Dauer(min)'].astype(int)
     complete_ava = complete_ava.loc[complete_ava.index.repeat(complete_ava['Dauer(min)'] + 1)]
-    complete_ava['Time (CET)'] += pd.to_timedelta(complete_ava.groupby(level=0).cumcount(), unit='s') * 60
+    complete_ava['Time (CET)'] += pd.to_timedelta(complete_ava.groupby(level=0).cumcount(), unit='min')
     complete_ava = complete_ava.reset_index(drop=True)
     if output:
         complete_ava.to_csv('ava.csv', index = False, encoding = 'utf-8')
