@@ -68,8 +68,12 @@ def read_in_redispatch_data(filter = 'none', split = True, translate = True, out
                                                     errors = 'coerce', dayfirst = True)
     redispatch['Ende Zeit (CET)'] = pd.to_datetime(redispatch['ENDE_DATUM'] + ' ' + redispatch['ENDE_UHRZEIT'],
                                                   errors = 'coerce', dayfirst = True)
+    redispatch = redispatch[(redispatch['Beginn Zeit (CET)'].dt.year > 2014) &
+                            (redispatch['Ende Zeit (CET)'].dt.year < 2018)]
     redispatch.drop(columns = ['BEGINN_DATUM','BEGINN_UHRZEIT','ENDE_DATUM', 'ENDE_UHRZEIT'])
-    redispatch = redispatch.dropna(subset=['Beginn Zeit (CET)', 'Ende Zeit (CET)'])
+    redispatch = redispatch[redispatch['GRUND_DER_MASSNAHME'] != 'Spannungsbedingter Redispatch']
+    redispatch = redispatch[~redispatch['GRUND_DER_MASSNAHME'].isnull()]
+    redispatch = redispatch.dropna(subset=['Beginn Zeit (CET)', 'Ende Zeit (CET)','GRUND_DER_MASSNAHME'])
     redispatch['Dauer'] = redispatch['Ende Zeit (CET)'] - redispatch['Beginn Zeit (CET)']
     redispatch['Dauer'] = round(redispatch['Dauer'] / np.timedelta64(60,'m'))
     redispatch['Dauer'] = redispatch['Dauer'].fillna(0)
@@ -78,6 +82,7 @@ def read_in_redispatch_data(filter = 'none', split = True, translate = True, out
     redispatch = redispatch.loc[redispatch.index.repeat(redispatch['Dauer'] + 1)]
     redispatch['Beginn Zeit (CET)'] += pd.to_timedelta(redispatch.groupby(level=0).cumcount(), unit='h')
     redispatch = redispatch.reset_index(drop=True)
+    redispatch.drop(columns=['BEGINN_DATUM', 'BEGINN_UHRZEIT', 'ENDE_DATUM', 'ENDE_UHRZEIT'], inplace = True)
     if translate:
         redispatch.rename(columns = {
        'NETZREGION':'Net_region', 'GRUND_DER_MASSNAHME':'Reason_for_measure', 'RICHTUNG':'Direction',
