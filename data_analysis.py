@@ -37,6 +37,11 @@ def filter_tso(df, tso = 'none', limited = True, output = True, name = 'no_name'
     df['Time (CET)'] = df['Time (CET)']
     df.sort_values(by = 'Time (CET)', inplace = True)
     df.drop(columns = ['ID', 'Einsatz-ID', 'Start', 'Ende', 'Anlagen-ID', 'Entschaedigungspflicht'], inplace = True)
+    time_frame = pd.DataFrame()
+    time_frame['Time (CET)'] = pd.date_range(start='2015-01-01', end='2017-12-31 23:59:59',
+                                             freq='s')
+    time_frame['Time (CET)'] = pd.to_datetime(time_frame['Time (CET)'], utc=True)
+    df = pd.merge(time_frame, df, how='left', on=['Time (CET)', 'Time (CET)'])
     if limited:
         df = df[(df['Time (CET)'].dt.year < 2018)]
     if tso not in ['50 Hertz','50Hertz', 'TenneT', 'tennet']:
@@ -70,7 +75,7 @@ def read_in_redispatch_data(filter = 'none', split = True, translate = True, out
                                                   errors = 'coerce', dayfirst = True)
     redispatch = redispatch[(redispatch['Beginn Zeit (CET)'].dt.year > 2014) &
                             (redispatch['Ende Zeit (CET)'].dt.year < 2018)]
-    redispatch.drop(columns = ['BEGINN_DATUM','BEGINN_UHRZEIT','ENDE_DATUM', 'ENDE_UHRZEIT'])
+    redispatch.drop(columns = ['BEGINN_DATUM','BEGINN_UHRZEIT','ENDE_DATUM', 'ENDE_UHRZEIT'], inplace = True)
     redispatch = redispatch[redispatch['GRUND_DER_MASSNAHME'] != 'Spannungsbedingter Redispatch']
     redispatch = redispatch[~redispatch['GRUND_DER_MASSNAHME'].isnull()]
     redispatch = redispatch.dropna(subset=['Beginn Zeit (CET)', 'Ende Zeit (CET)','GRUND_DER_MASSNAHME'])
@@ -82,7 +87,6 @@ def read_in_redispatch_data(filter = 'none', split = True, translate = True, out
     redispatch = redispatch.loc[redispatch.index.repeat(redispatch['Dauer'] + 1)]
     redispatch['Beginn Zeit (CET)'] += pd.to_timedelta(redispatch.groupby(level=0).cumcount(), unit='h')
     redispatch = redispatch.reset_index(drop=True)
-    redispatch.drop(columns=['BEGINN_DATUM', 'BEGINN_UHRZEIT', 'ENDE_DATUM', 'ENDE_UHRZEIT'], inplace = True)
     if translate:
         redispatch.rename(columns = {
        'NETZREGION':'Net_region', 'GRUND_DER_MASSNAHME':'Reason_for_measure', 'RICHTUNG':'Direction',
@@ -114,3 +118,20 @@ def read_in_redispatch_data(filter = 'none', split = True, translate = True, out
                     filter) + '.csv', index=False)
     return result
 
+def binarize_redispatch(df, output = True, name = 'no_filter'):
+    df.drop(
+        columns=['Net_region', 'Reason_for_measure', 'Mean_power_MW', 'MAX_POWER_MW', 'TOTAL_WORK_MWH', 'DIRECTING_TSO',
+                 'REQUESTING_TSO', 'AFFECTED_PS', 'Redispatch_KW', 'Duration_hour',
+                'End Time (CET)'], inplace=True)
+    df['Direction'] = df['Direction'].str.replace('decrease', '-1')
+    df['Direction'] = df['Direction'].replace('increase', '1')
+    df['Begin Time (CET)'] = pd.to_datetime(df['Begin Time (CET)'])
+    df = df.drop_duplicates(subset='Begin Time (CET)')
+    df['Direction'] = df['Direction'].astype(str)
+    df['Direction'] = df['Direction'].str.replace('nan', '0')
+    df['Direction'] = df['Direction'].astype(int)
+    print('Data is binarized - ready for classification')
+    if output:
+        df.to_csv('redispatch_data/binarized_redispatch/binarized_redispatch_for_TSO_{}.csv'.format(name), index = False)
+        print('Binarized output generated for TSO {}'.format(name))
+    return df

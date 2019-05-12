@@ -3,8 +3,8 @@ import pandas as pd
 
 ########Variables
 description = False
-tso_filter = False
-redispatch_filter = True
+tso_filter = True
+redispatch_filter = False
 
 #################
 bag = pd.read_csv('/Users/benni/Desktop/Uni/Paper/Einsman/bag.csv', low_memory = False)
@@ -31,4 +31,5 @@ if description:
 ##################
 
 if redispatch_filter:
-    redispatch_data = read_in_redispatch_data()
+    redispatch_data = read_in_redispatch_data(filter = '50Hertz')
+    bin_redispatch = binarize_redispatch(redispatch_data, name = '50Hertz')
