@@ -13,10 +13,10 @@ shn = pd.read_csv('/Users/benni/Desktop/Uni/Paper/Einsman/shn.csv', low_memory =
 ava = pd.read_csv('/Users/benni/Desktop/Uni/Paper/Einsman/ava.csv', low_memory = False)
 
 if tso_filter:
-    edi = filter_tso(edi, tso = '50 Hertz', name = 'edi')
-    ava = filter_tso(ava, tso = '50 Hertz', name = 'ava')
-    shn = filter_tso(shn, tso = '50 Hertz', name = 'shn')
-    bag = filter_tso(bag, tso = '50 Hertz', name = 'bag')
+    edi = filter_tso(edi, tso = '50 Hertz', name = 'edi', high_resolution= True)
+    ava = filter_tso(ava, tso = '50 Hertz', name = 'ava', high_resolution = True)
+    shn = filter_tso(shn, tso = '50 Hertz', name = 'shn', high_resolution = True)
+    bag = filter_tso(bag, tso = '50 Hertz', name = 'bag', high_resolution = True)
 
 if description:
     descriptor_einsman(bag, name = 'Bayernwerke AG')

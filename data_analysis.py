@@ -32,16 +32,17 @@ def descriptor_einsman(df, name = "no name defined", limited = True):
     return
 
 
-def filter_tso(df, tso = 'none', limited = True, output = True, name = 'no_name'):
+def filter_tso(df, tso = 'none', limited = True, output = True, name = 'no_name', high_resolution = False):
     df['Time (CET)'] = pd.to_datetime(df['Time (CET)'], utc = True)
     df['Time (CET)'] = df['Time (CET)']
     df.sort_values(by = 'Time (CET)', inplace = True)
     df.drop(columns = ['ID', 'Einsatz-ID', 'Start', 'Ende', 'Anlagen-ID', 'Entschaedigungspflicht'], inplace = True)
-    time_frame = pd.DataFrame()
-    time_frame['Time (CET)'] = pd.date_range(start='2015-01-01', end='2017-12-31 23:59:59',
-                                             freq='s')
-    time_frame['Time (CET)'] = pd.to_datetime(time_frame['Time (CET)'], utc=True)
-    df = pd.merge(time_frame, df, how='left', on=['Time (CET)', 'Time (CET)'])
+    if high_resolution:
+        time_frame = pd.DataFrame()
+        time_frame['Time (CET)'] = pd.date_range(start='2015-01-01', end='2017-12-31 23:59:59',
+                                                 freq='s')
+        time_frame['Time (CET)'] = pd.to_datetime(time_frame['Time (CET)'], utc=True)
+        df = pd.merge(time_frame, df, how='left', on=['Time (CET)', 'Time (CET)'])
     if limited:
         df = df[(df['Time (CET)'].dt.year < 2018)]
     if tso not in ['50 Hertz','50Hertz', 'TenneT', 'tennet']:
