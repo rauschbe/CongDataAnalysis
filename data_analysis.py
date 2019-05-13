@@ -37,12 +37,6 @@ def filter_tso(df, tso = 'none', limited = True, output = True, name = 'no_name'
     df['Time (CET)'] = df['Time (CET)']
     df.sort_values(by = 'Time (CET)', inplace = True)
     df.drop(columns = ['ID', 'Einsatz-ID', 'Start', 'Ende', 'Anlagen-ID', 'Entschaedigungspflicht'], inplace = True)
-    if high_resolution:
-        time_frame = pd.DataFrame()
-        time_frame['Time (CET)'] = pd.date_range(start='2015-01-01', end='2017-12-31 23:59:59',
-                                                 freq='s')
-        time_frame['Time (CET)'] = pd.to_datetime(time_frame['Time (CET)'], utc=True)
-        df = pd.merge(time_frame, df, how='left', on=['Time (CET)', 'Time (CET)'])
     if limited:
         df = df[(df['Time (CET)'].dt.year < 2018)]
     if tso not in ['50 Hertz','50Hertz', 'TenneT', 'tennet']:
@@ -50,16 +44,19 @@ def filter_tso(df, tso = 'none', limited = True, output = True, name = 'no_name'
     elif tso in ['50 Hertz','50Hertz']:
         df.Anforderer = df.Anforderer.apply(str)
         df = df[df.Anforderer.str.contains('Hertz')]
-        if output:
-            df.to_csv('/Users/benni/PycharmProjects/CongDataAnalysis/Filtered EinsManData/'+
-                      name + '_filtered_for_' + tso + '.csv', index = False)
     elif tso == ['TenneT','tennet']:
         df.Anforderer = df.Anforderer.apply(str)
         df.Anforderer = df.Anforderer.replace(['4033872000058','4050404000003'], 'TenneT')
         df = df[df.Anforderer.str.contains(tso)]
-        if output:
-            df.to_csv('/Users/benni/PycharmProjects/CongDataAnalysis/Filtered EinsManData/'+
-                      name + '_filtered_for_' + tso + '.csv', index = False)
+    if high_resolution:
+        time_frame = pd.DataFrame()
+        time_frame['Time (CET)'] = pd.date_range(start='2015-01-01', end='2017-12-31 23:59:59',
+                                                 freq='s')
+        time_frame['Time (CET)'] = pd.to_datetime(time_frame['Time (CET)'], utc=True)
+        df = pd.merge(time_frame, df, how='left', on=['Time (CET)', 'Time (CET)'])
+    if output:
+        df.to_csv('/Users/benni/PycharmProjects/CongDataAnalysis/Filtered EinsManData/' +
+                  name + '_filtered_for_' + tso + '.csv', index=False)
     print('finished filtering of dataframe {name} for TSO {tso}'.format(name = name, tso = tso))
     return df
 
@@ -109,14 +106,14 @@ def read_in_redispatch_data(filter = 'none', split = True, translate = True, out
     result = pd.merge(time_frame, redispatch,how='left', on=['Begin Time (CET)', 'Begin Time (CET)'])
     if output:
         result.to_csv('redispatch_data/Transformed_redispatch_data/redispatch_filtered_for_TSO_{}'.format(filter) + '.csv',
-                      index = False)
+                      index = False, encoding = 'utf-8')
         if split:
             result[result['Direction'] == 'increase'].to_csv(
                 'redispatch_data/Transformed_redispatch_data/redispatch_filtered_for_TSO_{}_increase'.format(filter) + '.csv',
-                index=False)
+                index=False, encoding = 'utf-8')
             result[result['Direction'] == 'decrease'].to_csv(
                 'redispatch_data/Transformed_redispatch_data/redispatch_filtered_for_TSO_{}_decrease'.format(
-                    filter) + '.csv', index=False)
+                    filter) + '.csv', index=False, encoding = 'utf-8')
     return result
 
 def binarize_redispatch(df, output = True, name = 'no_filter'):
@@ -135,4 +132,20 @@ def binarize_redispatch(df, output = True, name = 'no_filter'):
     if output:
         df.to_csv('redispatch_data/binarized_redispatch/binarized_redispatch_for_TSO_{}.csv'.format(name), index = False)
         print('Binarized output generated for TSO {}'.format(name))
+    return df
+
+def binarize_einsman(df, output = True, name = 'no name defined'):
+    time_frame = pd.DataFrame(
+        {'Time (CET)': pd.date_range(start='2015-01-02', end='2017-12-31 23:59:59', freq='1min')})
+    time_frame = pd.to_datetime(time_frame['Time (CET)'], utc=True)
+    df['Time (CET)'] = pd.to_datetime(df['Time (CET)'], utc=True, dayfirst=True) #TODO dayfirst richtig?
+    df = pd.merge(time_frame, df, how='left', on=['Time (CET)', 'Time (CET)'])
+    df = df.drop_duplicates(subset=['Time (CET)', 'Dauer(min)'])#TODO ist das richtig?
+    df['Dauer(min)'] = df['Dauer(min)'].fillna(0)
+    df['Dauer(min)'] = df['Dauer(min)'].astype(int)
+    df = df.loc[df.index.repeat(df['Dauer(min)'] + 1)]
+    df['Time (CET)'] += pd.to_timedelta(df.groupby(level=0).cumcount(), unit='m')
+    df[name + '_einsman'] = np.where(df['Dauer(min)'] > 30, 1, 0)
+    if output:
+        df.to_csv('binarized_einsman/'+name + '_30minmerged.csv', index=False, encoding='utf-8')
     return df

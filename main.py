@@ -1,6 +1,6 @@
 from data_analysis import *
 import pandas as pd
-
+import os
 ########Variables
 description = False
 tso_filter = True
@@ -13,10 +13,14 @@ shn = pd.read_csv('/Users/benni/Desktop/Uni/Paper/Einsman/shn.csv', low_memory =
 ava = pd.read_csv('/Users/benni/Desktop/Uni/Paper/Einsman/ava.csv', low_memory = False)
 
 if tso_filter:
-    edi = filter_tso(edi, tso = '50 Hertz', name = 'edi', high_resolution= True)
-    ava = filter_tso(ava, tso = '50 Hertz', name = 'ava', high_resolution = True)
-    shn = filter_tso(shn, tso = '50 Hertz', name = 'shn', high_resolution = True)
-    bag = filter_tso(bag, tso = '50 Hertz', name = 'bag', high_resolution = True)
+    edi = filter_tso(edi, name = 'edi', tso = '50 Hertz')
+    edi_binned = binarize_einsman(edi, name = '50Hertz_edi')
+    ava = filter_tso(ava, name = 'ava', tso = '50 Hertz')
+    ava_binned = binarize_einsman(ava, name = '50Hertz_ava')
+    shn = filter_tso(shn,  name = 'shn', tso = '50 Hertz')
+    shn_binned = binarize_einsman(shn, name = '50Hertz_shn')
+    bag = filter_tso(bag, name = 'bag', tso = '50 Hertz')
+    bag_binned = binarize_einsman(bag, name = '50Hertz_bag')
 
 if description:
     descriptor_einsman(bag, name = 'Bayernwerke AG')
