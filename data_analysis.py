@@ -110,10 +110,10 @@ def read_in_redispatch_data(filter = 'none', split = True, translate = True, out
         if split:
             result[result['Direction'] == 'increase'].to_csv(
                 'redispatch_data/Transformed_redispatch_data/redispatch_filtered_for_TSO_{}_increase'.format(filter) + '.csv',
-                index=False, encoding = 'utf-8')
+                index=False, encoding = 'ISO-8859-1')
             result[result['Direction'] == 'decrease'].to_csv(
                 'redispatch_data/Transformed_redispatch_data/redispatch_filtered_for_TSO_{}_decrease'.format(
-                    filter) + '.csv', index=False, encoding = 'utf-8')
+                    filter) + '.csv', index=False, encoding = 'ISO-8859-1')
     return result
 
 def binarize_redispatch(df, output = True, name = 'no_filter'):
@@ -134,18 +134,76 @@ def binarize_redispatch(df, output = True, name = 'no_filter'):
         print('Binarized output generated for TSO {}'.format(name))
     return df
 
-def binarize_einsman(df, output = True, name = 'no name defined'):
+def binarize_einsman(df, output = True, hourly = True, name = 'no name defined'):
     time_frame = pd.DataFrame(
         {'Time (CET)': pd.date_range(start='2015-01-02', end='2017-12-31 23:59:59', freq='1min')})
     time_frame = pd.to_datetime(time_frame['Time (CET)'], utc=True)
-    df['Time (CET)'] = pd.to_datetime(df['Time (CET)'], utc=True, dayfirst=True) #TODO dayfirst richtig?
+    df['Time (CET)'] = pd.to_datetime(df['Time (CET)'], utc=True, dayfirst=True)
+    df = df[df['Time (CET)'].dt.year < 2018]
     df = pd.merge(time_frame, df, how='left', on=['Time (CET)', 'Time (CET)'])
-    df = df.drop_duplicates(subset=['Time (CET)', 'Dauer(min)'])#TODO ist das richtig?
+    df = df.drop_duplicates(subset=['Time (CET)', 'Dauer(min)'])
     df['Dauer(min)'] = df['Dauer(min)'].fillna(0)
     df['Dauer(min)'] = df['Dauer(min)'].astype(int)
     df = df.loc[df.index.repeat(df['Dauer(min)'] + 1)]
     df['Time (CET)'] += pd.to_timedelta(df.groupby(level=0).cumcount(), unit='m')
     df[name + '_einsman'] = np.where(df['Dauer(min)'] > 30, 1, 0)
+    df = df.drop_duplicates(subset='Time (CET)')
+    df = df[df['Time (CET)'].dt.year < 2018]
+    df = df.set_index('Time (CET)', drop = True)
+    df.drop(columns = ['Dauer(min)', 'Gebiet', 'Ort Engpass', 'Stufe(%)', 'Ursache',
+       'Anlagenschluessel', 'Anforderer', 'Netzbetreiber'], inplace = True)
+    if hourly:
+        df = df.resample('H').pad()
     if output:
-        df.to_csv('binarized_einsman/'+name + '_30minmerged.csv', index=False, encoding='utf-8')
+        df.to_csv('binarized_einsman/'+name + '_30minmerged.csv', encoding='utf-8')
     return df
+
+def merger():
+    ava = pd.read_csv('/Users/benni/PycharmProjects/CongDataAnalysis/binarized_einsman/50Hertz_ava_30minmerged.csv')
+    edi = pd.read_csv('/Users/benni/PycharmProjects/CongDataAnalysis/binarized_einsman/50Hertz_edi_30minmerged.csv')
+    ava['50Hertz_edi_einsman'] = edi['50Hertz_edi_einsman']
+    redispatch_binned = pd.read_csv('redispatch_data/binarized_redispatch/binarized_redispatch_for_TSO_50Hertz.csv')
+    redispatch_binned.rename(columns={'Begin Time (CET)': 'Time (CET)'}, inplace=True)
+    ava['Time (CET)'] = pd.to_datetime(ava['Time (CET)'], utc = True)
+    redispatch_binned['Time (CET)'] = pd.to_datetime(redispatch_binned['Time (CET)'], utc=True)
+    merged = pd.merge(redispatch_binned, ava, on=['Time (CET)', 'Time (CET)'], how='left')
+    return merged
+
+
+def read_in_congdata():
+    lineload15q1 = pd.read_csv('Leitungslast/Netzlast50HzQ12015.csv', encoding='ISO-8859-1', sep=None, engine='python')
+    lineload15q2q3q41601 = pd.read_csv('Leitungslast/NetzlastQ220152016.csv', encoding='ISO-8859-1', sep=None,
+                                       engine='python')
+    lineload16q1 = pd.read_csv('Leitungslast/NetzlastQ150Hz2016.csv', encoding='ISO-8859-1', sep=None,
+                               engine='python')  ##ACHTUNG erst ab 11.01.2016
+    lineload16q2 = pd.read_csv('Leitungslast/NetzlastQ250Hz2016.csv', encoding='ISO-8859-1', sep=None, engine='python')
+    lineload16q3 = pd.read_csv('Leitungslast/NetzlastQ350Hz2016.csv', encoding='ISO-8859-1', sep=None, engine='python')
+    lineload16q4 = pd.read_csv('Leitungslast/NetzlastQ450Hz2016.csv', encoding='ISO-8859-1', sep=None, engine='python')
+    lineload17 = pd.read_csv('Leitungslast/Netzlast50HzQ12017.csv', encoding='ISO-8859-1', sep=None, engine='python')
+    lineload172 = pd.read_csv('Leitungslast/Netzlast2017abMai.csv', encoding='ISO-8859-1', sep=None, engine='python')
+
+    frame = [lineload15q1, lineload15q2q3q41601, lineload16q1, lineload16q2, lineload16q3, lineload16q4, lineload17]
+
+    lineload172['Zeit'] = pd.date_range(start='5/31/2017', end='12/31/2017 23:59:59', freq='H') #TODO fix error
+    lineload = pd.concat(frame, axis=0, ignore_index=True,
+                         sort=True)  # concatenating and joining new columns in all data frames with NaN as value
+    lineload['Zeit'] = pd.to_datetime(lineload['Zeit'], dayfirst=True)
+    lineload = pd.concat([lineload, lineload172], axis=0, ignore_index=True, sort=True)
+    lineload = lineload.fillna(
+        'NaN')  # prefilling of NaN with a string object to allow string operations on all columns and to avoid exceptions
+    lineload = lineload.drop_duplicates(subset='Zeit')
+
+    for col in lineload.columns[0:-1]:  # iterating from first column to last
+        lineload[col] = lineload[col].str.split('/').str[-1]  # split everything before '/'
+        lineload[col] = lineload[col].str.strip()  # removing of whitespace before color indicator
+
+    # print(lineload.apply(pd.value_counts(values='hoch')))
+    # lineload1 = lineload.replace(['grün','grü','gr','g','orange','grau','rot','hoch','gelb','0'],[1,1,1,1,1,'NaN',0,0,1,'NaN'])
+    lineload2 = lineload.replace(['grün', 'grü', 'gr', 'g', 'gr,n', 'orange', 'grau', 'rot', 'hoch', 'gelb'],
+                                 [0, 0, 0, 0, 0, 1, 'NaN', 1, 1, 1])
+    lineload2 = lineload2.set_index('Zeit', drop=True)
+    lineload = lineload.replace(['grün', 'grü', 'gr', 'g', 'gr,n', 'orange', 'grau', 'rot', 'hoch', 'gelb'],
+                                [0, 0, 0, 0, 0, 0, 'NaN', 1, 1,
+                                 0])  # replacing color indicator with binary code/NaN
+    lineload = lineload.set_index('Zeit', drop=True)
+
