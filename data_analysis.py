@@ -208,6 +208,7 @@ def bin_lineload_data(output = True):
     lineload['CongestedLine_yellow'] = lineload[col_list].eq(1).any(axis=1).astype(int)
     lineload['CongestedLine_red'] = lineload2[col_list].eq(1).any(axis=1).astype(int)
     lineload.drop(columns=col_list, inplace=True)
+
     if output:
         lineload.to_csv('Leitungslast/merged_lineload_binned.csv')
     return lineload
