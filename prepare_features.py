@@ -86,19 +86,7 @@ def dataset_forecast():
     netload = netload.reset_index(drop = True)
     print('# Loading and transforming netload data finished')
 
-    #netload actual 50 Hz
-    netloadactual = netloadactual[netloadactual['Actual Total Load [MW] - CTA|DE(50Hertz)']!='-']
-    mask = netloadactual['Time (CET)'] == netloadactual['Time (CET)'].dt.floor('H')
-    netloadactual = netloadactual[mask]
-    netloadactual = netloadactual.reset_index(drop = True)
-    netloadactual = netloadactual.set_index('Time (CET)',drop = True)
-    netloadactual = netloadactual.astype(float)
-
-    netloadactual['Actual Total Load [MW] - CTA|DE(50Hertz)'] = rescaler(netloadactual['Actual Total Load [MW] - CTA|DE(50Hertz)'])
-    netloadautoreg = netloadactual['Actual Total Load [MW] - CTA|DE(50Hertz)'].shift(periods = 1,freq='d')
-    netloadautoreg = netloadautoreg.rename(columns = {'Actual Total Load [MW] - CTA|DE(50Hertz)':'Autoreg_Netload'})
-    netloadautoreg = netloadautoreg.to_frame(name = 'Autoreg_Netload')
-    #netload Germany
+        #netload Germany
 
     netload15de = pd.read_csv('NetzlastDeutschland/NetzlastDE2015.csv')
     netload16de = pd.read_csv('NetzlastDeutschland/NetzlastDE2016.csv')
@@ -120,16 +108,6 @@ def dataset_forecast():
     print('#1 Loading and transforming netload data for Germany finished')
     #net input 50 hz control zone (Netzeinspeisung)
 
-
-    netloaddeactual = netloaddeactual[netloaddeactual['Actual Total Load [MW] - Germany (DE)']!='-']
-    mask = netloaddeactual['Time (CET)'] == netloaddeactual['Time (CET)'].dt.floor('H')
-    netloaddeactual = netloaddeactual[mask]
-    netloaddeactual = netloaddeactual.reset_index(drop = True)
-    netloaddeactual = netloaddeactual.set_index('Time (CET)',drop = True)
-    netloaddeactual = netloaddeactual.astype(float)
-
-    netloaddeactual['Actual Total Load [MW] - Germany (DE)'] = rescaler(netloaddeactual['Actual Total Load [MW] - Germany (DE)'])
-
     print('Netload Germany finished ######')
 
     netinput15 = pd.read_csv('Netzeinspeisung/Netzeinspeisung_2015.csv', sep = None, skiprows = [0,1,2,3], engine = 'python') #no seperator, first 4 rows dont have important information
@@ -147,22 +125,6 @@ def dataset_forecast():
     netinput = netinput.set_index('Datum', drop = True)
     netinput.rename(columns = {'MW':'Netinput_in_MW'}, inplace = True)
     print('##Loading and transforming netinput data finished')
-
-    netinputactual15 = pd.read_csv('Netzeinspeisungrealisiert/Netzeinspeisung_2015.csv', sep = None, skiprows = [0,1,2,3], engine = 'python') #no seperator, first 4 rows dont have important information
-    netinputactual16 = pd.read_csv('Netzeinspeisungrealisiert/Netzeinspeisung_2016.csv', sep = None, skiprows = [0,1,2,3], engine = 'python')
-    netinputactual17 = pd.read_csv('Netzeinspeisungrealisiert/Netzeinspeisung_2017.csv', sep = None, skiprows = [0,1,2,3], engine = 'python')
-    frame = [netinputactual15,netinputactual16, netinputactual17]
-    netinputactual = pd.concat(frame)
-    netinputactual['Datum'] = pd.to_datetime(netinputactual['Datum'] + ' ' + netinputactual['Von'], dayfirst = True, errors = 'coerce') #datetime formatting
-    del netinputactual['Von']
-    del netinputactual['bis']
-    del netinputactual['Unnamed: 4']
-    mask = netinputactual['Datum'] == netinputactual['Datum'].dt.floor('H') #only show the discrete values for every full hour
-    netinputactual = netinputactual[mask] #apply mask
-    netinputactual = netinputactual.reset_index(drop = True)
-    netinputactual = netinputactual.set_index('Datum', drop = True)
-    netinputactual['MW'] = rescaler(netinputactual['MW'])
-    netinputactual.rename(columns = {'MW':'Netinput_realisiert_in_MW'}, inplace = True)
     #solar energy
 
     solar15 = pd.read_csv('Solarenergie/Solarenergie_Prognose_2015.csv', sep = None, skiprows = [0,1,2,3], engine = 'python')
@@ -181,27 +143,6 @@ def dataset_forecast():
     del solar['Unnamed: 4']
     solar = solar.reset_index(drop = True)
     solar = solar.set_index('Datum', drop = True)
-
-    solaractual15 = pd.read_csv('Solarenergierealisiert/Solarenergie_Hochrechnung_2015.csv', sep = None, skiprows = [0,1,2,3], engine = 'python')
-    solaractual16 = pd.read_csv('Solarenergierealisiert/Solarenergie_Hochrechnung_2016.csv', sep = None, skiprows = [0,1,2,3], engine = 'python')
-    solaractual17 = pd.read_csv('Solarenergierealisiert/Solarenergie_Hochrechnung_2017.csv', sep = None, skiprows = [0,1,2,3], engine = 'python')
-
-    frame = [solaractual15, solaractual16, solaractual17]
-    solaractual = pd.concat(frame, sort = True)
-    solaractual['Datum'] = pd.to_datetime(solaractual['Datum'] + ' '+ solaractual['Von'], errors = 'coerce', dayfirst = True)
-    mask = solaractual['Datum'] == solaractual['Datum'].dt.floor('H')
-    solaractual = solaractual[mask]
-    solaractual.rename(columns = {'MW':'Solaractual_in_MW'}, inplace = True)
-    solaractual = solaractual.reset_index(drop = True)
-    solaractual = solaractual.set_index('Datum', drop = True)
-    solaractual['Solaractual_in_MW'] = solaractual['Solaractual_in_MW'].astype(str)
-    solaractual['Solaractual_in_MW'] = [x.replace('.','') for x in solaractual['Solaractual_in_MW']]
-    solaractual['Solaractual_in_MW'] = [x.replace(',','.') for x in solaractual['Solaractual_in_MW']]
-    solaractual['Solaractual_in_MW'] = solaractual['Solaractual_in_MW'].astype(float) #type conversion
-    solaractual['Solaractual_in_MW'] = rescaler(solaractual['Solaractual_in_MW'])
-    del solaractual['Von']
-    del solaractual['bis']
-    del solaractual['Unnamed: 4']
     print('#### Loading and transforming solar data finished')
 
     #wind energy
@@ -225,80 +166,6 @@ def dataset_forecast():
     wind = wind.reset_index(drop=True) #reindexing
     wind = wind.set_index('Datum', drop = True)
     print('###### Loading and transforming wind data finished')
-
-    #realized wind input
-    windactual15 = pd.read_csv('Windrealisiert/Windenergie_Hochrechnung_2015.csv', sep = None, skiprows=[0,1,2,3], engine = 'python')
-    windacutal16 = pd.read_csv('Windrealisiert/Windenergie_Hochrechnung_2016.csv', sep = None, skiprows = [0,1,2,3], engine = 'python')
-    windactual17 = pd.read_csv('Windrealisiert/Windenergie_Hochrechnung_2017.csv', sep = None, skiprows = [0,1,2,3], engine = 'python')
-
-    frame = [windactual15,windacutal16, windactual17]
-    windactual = pd.concat(frame, sort = True)
-    windactual['Datum'] = pd.to_datetime(windactual['Datum']+ ' '+ windactual['Von'], errors = 'coerce', dayfirst = True)
-    mask = windactual['Datum'] == windactual['Datum'].dt.floor('H')
-    del windactual['Von']
-    del windactual['bis']
-    del windactual['Offshore MW']
-    del windactual['Onshore MW']
-    del windactual['Unnamed: 4']
-    del windactual['Unnamed: 6']
-    windactual.rename(columns = {'MW':'Windactual_in_MW'}, inplace = True)
-    windactual = windactual.reset_index(drop = True)
-    windactual = windactual.set_index('Datum', drop = True)
-    windactual['Windactual_in_MW'] = windactual['Windactual_in_MW'].astype(str)
-    windactual['Windactual_in_MW'] = [x.replace('.','') for x in windactual['Windactual_in_MW']]
-    windactual['Windactual_in_MW'] = [x.replace(',','.') for x in windactual['Windactual_in_MW']]
-    windactual['Windactual_in_MW'] = windactual['Windactual_in_MW'].astype(float) #type conversion
-    windactual['Windactual_in_MW'] = rescaler(windactual['Windactual_in_MW'])
-    windautoreg = windactual.shift(periods = 1,freq='d')
-    windautoreg = windautoreg.rename(columns = {'Windactual_in_MW':'Autoreg_Wind_MW'})
-
-    #impexp real
-    cbfdecz15 = pd.read_csv('RealizedCrossBoarderFlows/Cross-Border Physical FlowDECZ2015.csv')
-    cbfdecz16 = pd.read_csv('RealizedCrossBoarderFlows/Cross-Border Physical FlowDECZ2016.csv')
-    cbfdecz17 = pd.read_csv('RealizedCrossBoarderFlows/Cross-Border Physical FlowDECZ2017.csv')
-    cbfdedk15 = pd.read_csv('RealizedCrossBoarderFlows/Cross-Border Physical FlowDEDK2015.csv')
-    cbfdedk16 = pd.read_csv('RealizedCrossBoarderFlows/Cross-Border Physical FlowDEDK2016.csv')
-    cbfdedk17 = pd.read_csv('RealizedCrossBoarderFlows/Cross-Border Physical FlowDEDK2017.csv')
-    cbfdepl15 = pd.read_csv('RealizedCrossBoarderFlows/Cross-Border Physical FlowDEPL2015.csv')
-    cbfdepl16 = pd.read_csv('RealizedCrossBoarderFlows/Cross-Border Physical FlowDEPL2016.csv')
-    cbfdepl17 = pd.read_csv('RealizedCrossBoarderFlows/Cross-Border Physical FlowDEPL2017.csv')
-
-    framecz = [cbfdecz15,cbfdecz16,cbfdecz17]
-    framedk = [cbfdedk15,cbfdedk16,cbfdedk17]
-    framepl = [cbfdepl15,cbfdepl16,cbfdepl17]
-
-    cbf = pd.concat(framecz, sort = True)
-    print(cbf.columns)
-    cbfdk = pd.concat(framedk, sort = True)
-    print(cbfdk.columns)
-    cbfdk = cbfdk.set_index('Time (CET)')
-    cbfpl = pd.concat(framepl, sort = True)
-    print(cbfpl.columns)
-    cbfpl = cbfpl.set_index('Time (CET)')
-
-    cbf = cbf.join(cbfdk, on = 'Time (CET)', how = 'inner')
-    cbf = cbf.join(cbfpl, on = 'Time (CET)', how = 'inner')
-    cbf['Time (CET)'] = cbf['Time (CET)'].str.split('-').str[0]
-    cbf['Time (CET)'] = pd.to_datetime(cbf['Time (CET)'], dayfirst = True)
-    col_list = ['CTA|CZ > CTA|DE(50Hertz) [MW]', 'CTA|PL > CTA|DE(50Hertz) [MW]','CTA|DE(50Hertz) > CTA|CZ [MW]','CTA|DE(50Hertz) > CTA|PL [MW]','CTA|DE(50Hertz) > CTA|DK [MW]','CTA|DK > CTA|DE(50Hertz) [MW]']
-    cbf[col_list] = cbf[col_list].replace(['n/e','N/A'],['0','0'])
-    cbf[col_list] = cbf[col_list].replace('-','0')
-    cbf[col_list] = cbf[col_list].astype(float)
-    cbf['CTA|DE(50Hertz) > CTA|CZ [MW]'] = cbf['CTA|DE(50Hertz) > CTA|CZ [MW]'] - cbf['CTA|CZ > CTA|DE(50Hertz) [MW]'] #creating one variable showing import (R-) or export (R+)
-    del cbf['CTA|CZ > CTA|DE(50Hertz) [MW]']
-    cbf['CTA|DE(50Hertz) > CTA|PL [MW]'] = cbf['CTA|DE(50Hertz) > CTA|PL [MW]'] - cbf['CTA|PL > CTA|DE(50Hertz) [MW]']
-    del cbf['CTA|PL > CTA|DE(50Hertz) [MW]']
-    cbf['CTA|DE(50Hertz) > CTA|DK [MW]'] = cbf['CTA|DE(50Hertz) > CTA|DK [MW]'] - cbf['CTA|DK > CTA|DE(50Hertz) [MW]']
-    del cbf['CTA|DK > CTA|DE(50Hertz) [MW]']
-    cbf = cbf.rename(columns = {'CTA|DE(50Hertz) > CTA|CZ [MW]':'Realized_ImpExp_DECZ','CTA|DE(50Hertz) > CTA|PL [MW]':'Realized_ImpExp_DEPL','CTA|DE(50Hertz) > CTA|DK [MW]':'Realized_ImpExp_DEDK'})#renaming of columns
-    cbf = cbf.set_index('Time (CET)', drop = True)
-    #cbf = cbf.fillna(0)
-    cbfautoreg = cbf['Realized_ImpExp_DECZ']
-    #del cbfautoreg['Realized_ImpExp_DEPL']
-    #del cbfautoreg['Realized_ImpExp_DEDK']
-    cbfautoreg = cbfautoreg.to_frame('Autoreg_ImpExp_DECZ')
-    cbfautoreg = cbfautoreg.shift(periods =1, freq='d')
-    cbfautoreg = rescaler(cbfautoreg['Autoreg_ImpExp_DECZ'])
 
     #import,exports boarders
 
@@ -395,58 +262,7 @@ def dataset_forecast():
     prices151617 = prices151617.reset_index()
     prices151617 = prices151617.set_index('Time (CET)',drop=True)
 
-
-    pricesreal1516 = pd.read_csv('Preiserealisiert/50Hertz_Großhandelspreise_20152016.csv', sep = None, engine='python',
-                                 usecols = [0,1,15], encoding = 'utf-8', decimal = ',')
-    pricesreal17 = pd.read_csv('Preiserealisiert/50Hertz_Großhandelspreise_2017.csv', sep = None, engine = 'python',
-                               usecols = [0,1,15], encoding = 'utf-8', decimal = ',')
-    frame = [pricesreal1516,pricesreal17]
-    pricesreal = pd.concat(frame, sort = True)
-    pricesreal.rename(columns = {'Deutschland/Österreich/Luxemburg[Euro/MWh]':
-                                  'Preise_realisiert','\ufeffDatum':'Datum'}, inplace = True)
-    pricesreal['Preise_realisiert'] = pricesreal['Preise_realisiert'].replace('-','NaN')
-    pricesreal['Preise_realisiert'] = pricesreal['Preise_realisiert'].astype(float)
-    pricesreal['Preise_realisiert'] = rescaler(pricesreal['Preise_realisiert'])
-    pricesreal['Datum'] = pd.to_datetime(pricesreal['Datum'] + ' ' + pricesreal['Uhrzeit'], dayfirst = True)
-    del pricesreal['Uhrzeit']
-    pricesreal = pricesreal.set_index('Datum', drop = True)
-
-    generationreal1516 = pd.read_csv('Generationrealisiert/50Hertz_Realisierte Erzeugung_20152016.csv',
-                                decimal = ',', sep = None, engine = 'python')
-    generationreal17 = pd.read_csv('Generationrealisiert/50Hertz_Realisierte_Erzeugung_2017.csv',
-                                  decimal = ',', sep = None, engine = 'python')
-    frame = [generationreal1516, generationreal17]
-    generationreal = pd.concat(frame, sort = True)
-    generationreal.rename(columns = {'\ufeffDatum':'Datum'},inplace = True)
-    generationreal['Datum'] = pd.to_datetime(generationreal['Datum'] + ' ' + generationreal['Uhrzeit'],
-                                            dayfirst = True)
-    del generationreal['Uhrzeit']
-    mask = generationreal['Datum'] == generationreal['Datum'].dt.floor('H')
-    generationreal = generationreal[mask]
-    generationreal = generationreal.set_index('Datum', drop = True)
-    for column in generationreal.columns:
-        generationreal[column] = generationreal[column].astype(str)
-        generationreal[column] = [x.replace('.','') for x in generationreal[column]]
-        generationreal[column] = [x.replace(',','.') for x in generationreal[column]]
-        generationreal[column] = [x.replace('-','NaN') for x in generationreal[column]]
-        generationreal[column] = generationreal[column].astype(float)
-
-    generationreal['Total_Generation_MWh'] = generationreal.sum(axis = 1)
-    generationreal = pd.DataFrame(generationreal['Total_Generation_MWh'])
-    generationreal['Total_Generation_MWh'] = rescaler(generationreal['Total_Generation_MWh'])
-
     print('Loading and transforming price data finished')
-
-
-    #Reading in Clustered Reference Day
-    print(netload.tail(1))
-    print(netloadde.tail(1))
-    print(netinput.tail(1))
-    print(solar.tail(1))
-    print(wind.tail(1))
-    print(impexp.tail(1))
-    print(gen.tail(1))
-    print(prices151617.tail(1))
 
     #creating a concatenated dataset, merging is controlled by time variable
     X = netload
@@ -506,23 +322,7 @@ def dataset_forecast():
     X['BDay/WE'] = X['BDay/WE'].astype(str)
     X['BDay/WE'] = [x.replace('2','1') for x in X['BDay/WE']]
     X['BDay/WE'] = X['BDay/WE'].astype(float)
-
-
-    X = X.join(cbf, on = 'Time (CET)', how = 'inner')
-    X = X.join(netloadactual, on = 'Time (CET)', how ='inner')
-    X = X.join(windactual, on ='Time (CET)', how ='inner')
-    X = X.join(netloadautoreg, on ='Time (CET)', how ='inner')
-    X = X.join(windautoreg, on = 'Time (CET)', how ='inner')
-    X = X.join(cbfautoreg, on = 'Time (CET)', how = 'inner')
-    X = X.join(netloaddeactual, on = 'Time (CET)', how = 'inner')
-    X = X.join(netinputactual, on = 'Time (CET)', how = 'inner')
-    X = X.join(solaractual, on = 'Time (CET)', how = 'inner')
-    X = X.join(generationreal, on = 'Time (CET)', how = 'inner')
-    X = X.join(pricesreal, on = 'Time (CET)', how = 'inner')
-    X['Realized_ImpExp_DECZ'] = rescaler(X['Realized_ImpExp_DECZ'])
-    X['Realized_ImpExp_DEPL'] = rescaler(X['Realized_ImpExp_DEPL'])
-    X['Realized_ImpExp_DEDK'] = rescaler(X['Realized_ImpExp_DEDK'])
     del X['index']
-
+    X.to_csv('/Users/benni/PycharmProjects/CongDataAnalysis/features.csv', index = False)
 
     return X

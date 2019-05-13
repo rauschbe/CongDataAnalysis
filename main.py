@@ -1,6 +1,7 @@
 from data_analysis import *
 import pandas as pd
-from forecast_einsman import *
+import os
+from prepare_features import *
 ########Variables
 description = False
 tso_filter = False
@@ -43,8 +44,12 @@ if merge:
     merged = merger()
 
 if prepare_forecast_einsman:
-    dataset = dataset_forecast()
+    dataset = pd.read_csv('features.csv')
+    dataset['Time (CET)'] = pd.to_datetime(dataset['Time (CET)'])
+    del dataset['Unnamed: 0']
     prep_merge = pd.read_csv('merged_all_cong_data_IMP.csv')
+    prep_merge['Time (CET)'] = pd.to_datetime(prep_merge['Time (CET)'])
+    prep_merge = prep_merge.set_index('Time (CET)', drop = True)
     dataset_edi = dataset.join(prep_merge['50Hertz_edi_einsman'], on = 'Time (CET)', how = 'inner')
     dataset_ava = dataset.join(prep_merge['50Hertz_ava_einsman'], on = 'Time (CET)', how = 'inner')
     dataset_edi.to_csv('dataset_edi.csv')
