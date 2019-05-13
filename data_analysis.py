@@ -158,7 +158,7 @@ def binarize_einsman(df, output = True, hourly = True, name = 'no name defined')
         df.to_csv('binarized_einsman/'+name + '_30minmerged.csv', encoding='utf-8')
     return df
 
-def merger():
+def merger(output = True):
     ava = pd.read_csv('/Users/benni/PycharmProjects/CongDataAnalysis/binarized_einsman/50Hertz_ava_30minmerged.csv')
     edi = pd.read_csv('/Users/benni/PycharmProjects/CongDataAnalysis/binarized_einsman/50Hertz_edi_30minmerged.csv')
     ava['50Hertz_edi_einsman'] = edi['50Hertz_edi_einsman']
@@ -169,6 +169,11 @@ def merger():
     lineload = bin_lineload_data(output = False)
     merged = pd.merge(redispatch_binned, ava, on=['Time (CET)', 'Time (CET)'], how='left')
     merged = pd.merge(lineload, merged, on = ['Time (CET)', 'Time (CET)'], how = 'left')
+    merged['Direction'] = merged['Direction'].astype(str)
+    merged['Direction'] = merged['Direction'].str.replace('-1','1')
+    merged['Direction'] = merged['Direction'].astype(int)
+    if output:
+        merged.to_csv('merged_all_cong_data_IMP.csv', index = False)
     return merged
 
 
@@ -200,18 +205,14 @@ def bin_lineload_data(output = True):
         lineload[col] = lineload[col].str.strip()  # removing of whitespace before color indicator
     lineload = lineload.replace(['grün', 'grü', 'gr', 'g', 'gr,n', 'orange', 'grau', 'rot', 'hoch', 'gelb'],
                                 [0, 0, 0, 0, 0, 1, 'NaN', 1, 1, 1])
-    lineload2 = lineload.replace(['grün', 'grü', 'gr', 'g', 'gr,n', 'orange', 'grau', 'rot', 'hoch', 'gelb'],
-                                 [0, 0, 0, 0, 0, 0, 'NaN', 1, 1, 0])  # replacing color indicator with binary code/NaN
     lineload = pd.merge(time_frame, lineload, how='left', on=['Zeit', 'Zeit'])
-    lineload2 = pd.merge(time_frame, lineload2, how='left', on=['Zeit', 'Zeit'])
     lineload = lineload.set_index('Zeit', drop=True)
-    lineload2 = lineload2.set_index('Zeit', drop=True)
     col_list = lineload.columns
     lineload['CongestedLine_yellow'] = lineload[col_list].eq(1).any(axis=1).astype(int)
-    lineload['CongestedLine_red'] = lineload2[col_list].eq(1).any(axis=1).astype(int)
     lineload.drop(columns=col_list, inplace=True)
     lineload = lineload.reset_index()
     lineload.rename(columns={'Zeit': 'Time (CET)'}, inplace=True)
+    lineload['Time (CET)'] = pd.to_datetime(lineload['Time (CET)'], utc = True)
     if output:
         lineload.to_csv('Leitungslast/merged_lineload_binned.csv')
     return lineload

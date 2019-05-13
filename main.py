@@ -1,11 +1,12 @@
 from data_analysis import *
 import pandas as pd
-import os
+from forecast_einsman import *
 ########Variables
 description = False
-tso_filter = True
+tso_filter = False
 redispatch_filter = False
-
+merge = False
+prepare_forecast_einsman = True
 #################
 bag = pd.read_csv('/Users/benni/Desktop/Uni/Paper/Einsman/bag.csv', low_memory = False)
 edi = pd.read_csv('/Users/benni/Desktop/Uni/Paper/Einsman/edi.csv', low_memory = False)
@@ -37,3 +38,14 @@ if description:
 if redispatch_filter:
     redispatch_data = read_in_redispatch_data(filter = '50Hertz')
     bin_redispatch = binarize_redispatch(redispatch_data, name = '50Hertz')
+
+if merge:
+    merged = merger()
+
+if prepare_forecast_einsman:
+    dataset = dataset_forecast()
+    prep_merge = pd.read_csv('merged_all_cong_data_IMP.csv')
+    dataset_edi = dataset.join(prep_merge['50Hertz_edi_einsman'], on = 'Time (CET)', how = 'inner')
+    dataset_ava = dataset.join(prep_merge['50Hertz_ava_einsman'], on = 'Time (CET)', how = 'inner')
+    dataset_edi.to_csv('dataset_edi.csv')
+    dataset_ava.to_csv('dataset_ava.csv')
