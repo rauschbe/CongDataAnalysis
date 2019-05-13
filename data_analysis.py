@@ -170,7 +170,7 @@ def merger():
     return merged
 
 
-def read_in_congdata():
+def bin_lineload_data(output = True):
     lineload15q1 = pd.read_csv('Leitungslast/Netzlast50HzQ12015.csv', encoding='ISO-8859-1', sep=None, engine='python')
     lineload15q2q3q41601 = pd.read_csv('Leitungslast/NetzlastQ220152016.csv', encoding='ISO-8859-1', sep=None,
                                        engine='python')
@@ -184,26 +184,30 @@ def read_in_congdata():
 
     frame = [lineload15q1, lineload15q2q3q41601, lineload16q1, lineload16q2, lineload16q3, lineload16q4, lineload17]
 
-    lineload172['Zeit'] = pd.date_range(start='5/31/2017', end='12/31/2017 23:59:59', freq='H') #TODO fix error
+    time_frame = pd.DataFrame(
+        {'Zeit': pd.date_range(start='2015-01-01', end='2017-12-31 23:59:59', freq='H')})
+    lineload172['Zeit'] = pd.date_range(start='5/31/2017', end='12/31/2017', freq='H')
     lineload = pd.concat(frame, axis=0, ignore_index=True,
                          sort=True)  # concatenating and joining new columns in all data frames with NaN as value
     lineload['Zeit'] = pd.to_datetime(lineload['Zeit'], dayfirst=True)
     lineload = pd.concat([lineload, lineload172], axis=0, ignore_index=True, sort=True)
     lineload = lineload.fillna(
         'NaN')  # prefilling of NaN with a string object to allow string operations on all columns and to avoid exceptions
-    lineload = lineload.drop_duplicates(subset='Zeit')
-
     for col in lineload.columns[0:-1]:  # iterating from first column to last
         lineload[col] = lineload[col].str.split('/').str[-1]  # split everything before '/'
         lineload[col] = lineload[col].str.strip()  # removing of whitespace before color indicator
-
-    # print(lineload.apply(pd.value_counts(values='hoch')))
-    # lineload1 = lineload.replace(['grün','grü','gr','g','orange','grau','rot','hoch','gelb','0'],[1,1,1,1,1,'NaN',0,0,1,'NaN'])
-    lineload2 = lineload.replace(['grün', 'grü', 'gr', 'g', 'gr,n', 'orange', 'grau', 'rot', 'hoch', 'gelb'],
-                                 [0, 0, 0, 0, 0, 1, 'NaN', 1, 1, 1])
-    lineload2 = lineload2.set_index('Zeit', drop=True)
     lineload = lineload.replace(['grün', 'grü', 'gr', 'g', 'gr,n', 'orange', 'grau', 'rot', 'hoch', 'gelb'],
-                                [0, 0, 0, 0, 0, 0, 'NaN', 1, 1,
-                                 0])  # replacing color indicator with binary code/NaN
+                                [0, 0, 0, 0, 0, 1, 'NaN', 1, 1, 1])
+    lineload2 = lineload.replace(['grün', 'grü', 'gr', 'g', 'gr,n', 'orange', 'grau', 'rot', 'hoch', 'gelb'],
+                                 [0, 0, 0, 0, 0, 0, 'NaN', 1, 1, 0])  # replacing color indicator with binary code/NaN
+    lineload = pd.merge(time_frame, lineload, how='left', on=['Zeit', 'Zeit'])
+    lineload2 = pd.merge(time_frame, lineload2, how='left', on=['Zeit', 'Zeit'])
     lineload = lineload.set_index('Zeit', drop=True)
-
+    lineload2 = lineload2.set_index('Zeit', drop=True)
+    col_list = lineload.columns
+    lineload['CongestedLine_yellow'] = lineload[col_list].eq(1).any(axis=1).astype(int)
+    lineload['CongestedLine_red'] = lineload2[col_list].eq(1).any(axis=1).astype(int)
+    lineload.drop(columns=col_list, inplace=True)
+    if output:
+        lineload.to_csv('Leitungslast/merged_lineload_binned.csv')
+    return lineload
