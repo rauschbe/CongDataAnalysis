@@ -166,7 +166,9 @@ def merger():
     redispatch_binned.rename(columns={'Begin Time (CET)': 'Time (CET)'}, inplace=True)
     ava['Time (CET)'] = pd.to_datetime(ava['Time (CET)'], utc = True)
     redispatch_binned['Time (CET)'] = pd.to_datetime(redispatch_binned['Time (CET)'], utc=True)
+    lineload = bin_lineload_data(output = False)
     merged = pd.merge(redispatch_binned, ava, on=['Time (CET)', 'Time (CET)'], how='left')
+    merged = pd.merge(lineload, merged, on = ['Time (CET)', 'Time (CET)'], how = 'left')
     return merged
 
 
@@ -208,7 +210,8 @@ def bin_lineload_data(output = True):
     lineload['CongestedLine_yellow'] = lineload[col_list].eq(1).any(axis=1).astype(int)
     lineload['CongestedLine_red'] = lineload2[col_list].eq(1).any(axis=1).astype(int)
     lineload.drop(columns=col_list, inplace=True)
-
+    lineload = lineload.reset_index()
+    lineload.rename(columns={'Zeit': 'Time (CET)'}, inplace=True)
     if output:
         lineload.to_csv('Leitungslast/merged_lineload_binned.csv')
     return lineload
