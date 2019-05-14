@@ -134,7 +134,7 @@ def binarize_redispatch(df, output = True, name = 'no_filter'):
         print('Binarized output generated for TSO {}'.format(name))
     return df
 
-def binarize_einsman(df, output = True, hourly = True, name = 'no name defined'):
+def binarize_einsman(df, output = True, hourly = True, name = 'no name defined', granularity = 30):
     time_frame = pd.DataFrame(
         {'Time (CET)': pd.date_range(start='2015-01-02', end='2017-12-31 23:59:59', freq='1min')})
     time_frame = pd.to_datetime(time_frame['Time (CET)'], utc=True)
@@ -146,7 +146,7 @@ def binarize_einsman(df, output = True, hourly = True, name = 'no name defined')
     df['Dauer(min)'] = df['Dauer(min)'].astype(int)
     df = df.loc[df.index.repeat(df['Dauer(min)'] + 1)]
     df['Time (CET)'] += pd.to_timedelta(df.groupby(level=0).cumcount(), unit='m')
-    df[name + '_einsman'] = np.where(df['Dauer(min)'] > 30, 1, 0)
+    df[name + '_einsman'] = np.where(df['Dauer(min)'] > granularity, 1, 0)
     df = df.drop_duplicates(subset='Time (CET)')
     df = df[df['Time (CET)'].dt.year < 2018]
     df = df.set_index('Time (CET)', drop = True)

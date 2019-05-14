@@ -2,12 +2,14 @@ from data_analysis import *
 import pandas as pd
 import os
 from prepare_features import *
+from einsman_forecast import model
 ########Variables
 description = False
-tso_filter = False
+tso_filter = True
 redispatch_filter = False
-merge = False
-prepare_forecast_einsman = True
+merge = True
+prepare_forecast_einsman = False
+forecast = True
 #################
 bag = pd.read_csv('/Users/benni/Desktop/Uni/Paper/Einsman/bag.csv', low_memory = False)
 edi = pd.read_csv('/Users/benni/Desktop/Uni/Paper/Einsman/edi.csv', low_memory = False)
@@ -16,13 +18,9 @@ ava = pd.read_csv('/Users/benni/Desktop/Uni/Paper/Einsman/ava.csv', low_memory =
 
 if tso_filter:
     edi = filter_tso(edi, name = 'edi', tso = '50 Hertz')
-    edi_binned = binarize_einsman(edi, name = '50Hertz_edi')
+    edi_binned = binarize_einsman(edi, name = '50Hertz_edi', granularity=60)
     ava = filter_tso(ava, name = 'ava', tso = '50 Hertz')
-    ava_binned = binarize_einsman(ava, name = '50Hertz_ava')
-    shn = filter_tso(shn,  name = 'shn', tso = '50 Hertz')
-    shn_binned = binarize_einsman(shn, name = '50Hertz_shn')
-    bag = filter_tso(bag, name = 'bag', tso = '50 Hertz')
-    bag_binned = binarize_einsman(bag, name = '50Hertz_bag')
+    ava_binned = binarize_einsman(ava, name = '50Hertz_ava', granularity=60)
 
 if description:
     descriptor_einsman(bag, name = 'Bayernwerke AG')
@@ -54,3 +52,8 @@ if prepare_forecast_einsman:
     dataset_ava = dataset.join(prep_merge['50Hertz_ava_einsman'], on = 'Time (CET)', how = 'inner')
     dataset_edi.to_csv('dataset_edi.csv')
     dataset_ava.to_csv('dataset_ava.csv')
+
+if forecast:
+    dataset_edi = pd.read_csv('dataset_edi.csv')
+    print('EDI ###############################')
+    model(dataset_edi)
