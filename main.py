@@ -5,11 +5,11 @@ from prepare_features import *
 from einsman_forecast import model
 ########Variables
 description = False
-tso_filter = True
+tso_filter = False
 redispatch_filter = False
 merge = True
 prepare_forecast_einsman = False
-forecast = True
+forecast = False
 #################
 bag = pd.read_csv('/Users/benni/Desktop/Uni/Paper/Einsman/bag.csv', low_memory = False)
 edi = pd.read_csv('/Users/benni/Desktop/Uni/Paper/Einsman/edi.csv', low_memory = False)
@@ -18,9 +18,9 @@ ava = pd.read_csv('/Users/benni/Desktop/Uni/Paper/Einsman/ava.csv', low_memory =
 
 if tso_filter:
     edi = filter_tso(edi, name = 'edi', tso = '50 Hertz')
-    edi_binned = binarize_einsman(edi, name = '50Hertz_edi', granularity=60)
+    edi_binned = binarize_einsman(edi, name = '50Hertz_edi', granularity=200)
     ava = filter_tso(ava, name = 'ava', tso = '50 Hertz')
-    ava_binned = binarize_einsman(ava, name = '50Hertz_ava', granularity=60)
+    ava_binned = binarize_einsman(ava, name = '50Hertz_ava', granularity=200)
 
 if description:
     descriptor_einsman(bag, name = 'Bayernwerke AG')

@@ -208,7 +208,10 @@ def bin_lineload_data(output = True):
     lineload = pd.merge(time_frame, lineload, how='left', on=['Zeit', 'Zeit'])
     lineload = lineload.set_index('Zeit', drop=True)
     col_list = lineload.columns
-    lineload['CongestedLine_yellow'] = lineload[col_list].eq(1).any(axis=1).astype(int)
+    for col in lineload.columns:
+        lineload[col] = lineload[col].astype(float)
+    lineload['Sumperdate'] = lineload.sum(axis = 1)
+    lineload['CongestedLine_yellow'] = np.where(lineload['Sumperdate'] >= 4, 1, 0)
     lineload.drop(columns=col_list, inplace=True)
     lineload = lineload.reset_index()
     lineload.rename(columns={'Zeit': 'Time (CET)'}, inplace=True)

@@ -37,10 +37,13 @@ recall_lreg = []
 assesedlines = []
 def model(dataset):
     try:
-        n_items = 12
+        n_items = 7
         dataset = dataset.dropna()  # dropnans to allow good learning
         del dataset['Unnamed: 0']
         del dataset['Time (CET)']
+        dataset.drop(columns = ['Balance_ImpExp_DEPL','Balance_ImpExp_DEDK',
+                                'Balance_ImpExp_DECZ','Day-ahead Total Load Forecast [MW] - Germany (DE)',
+                                'Scheduled Generation [MW] (D) - CTA|DE(50Hertz)'], inplace = True)
         # setting up numpy array
         dataset = dataset.values
         X = dataset[:, 0:n_items]
