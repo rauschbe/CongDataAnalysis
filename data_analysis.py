@@ -187,17 +187,16 @@ def bin_lineload_data(output = True):
     lineload16q3 = pd.read_csv('Leitungslast/NetzlastQ350Hz2016.csv', encoding='ISO-8859-1', sep=None, engine='python')
     lineload16q4 = pd.read_csv('Leitungslast/NetzlastQ450Hz2016.csv', encoding='ISO-8859-1', sep=None, engine='python')
     lineload17 = pd.read_csv('Leitungslast/Netzlast50HzQ12017.csv', encoding='ISO-8859-1', sep=None, engine='python')
-    lineload172 = pd.read_csv('Leitungslast/Netzlast2017abMai.csv', encoding='ISO-8859-1', sep=None, engine='python')
-
-    frame = [lineload15q1, lineload15q2q3q41601, lineload16q1, lineload16q2, lineload16q3, lineload16q4, lineload17]
+    lineload172 = pd.read_csv('Leitungslast/Netzlast_2017abMai.csv', encoding='ISO-8859-1', sep=None, engine='python',
+                              skiprows=1)
+    frame = [lineload15q1, lineload15q2q3q41601, lineload16q1, lineload16q2, lineload16q3, lineload16q4, lineload17,
+             lineload172]
 
     time_frame = pd.DataFrame(
         {'Zeit': pd.date_range(start='2015-01-01', end='2017-12-31 23:59:59', freq='H')})
-    lineload172['Zeit'] = pd.date_range(start='5/31/2017', end='12/31/2017', freq='H')
     lineload = pd.concat(frame, axis=0, ignore_index=True,
                          sort=True)  # concatenating and joining new columns in all data frames with NaN as value
     lineload['Zeit'] = pd.to_datetime(lineload['Zeit'], dayfirst=True)
-    lineload = pd.concat([lineload, lineload172], axis=0, ignore_index=True, sort=True)
     lineload = lineload.fillna(
         'NaN')  # prefilling of NaN with a string object to allow string operations on all columns and to avoid exceptions
     for col in lineload.columns[0:-1]:  # iterating from first column to last
