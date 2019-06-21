@@ -51,8 +51,7 @@ def model(dataset):
         np.random.seed(8)
         splits = 10
         kfold = StratifiedKFold(n_splits=splits, shuffle=True, random_state=8)
-        cvscores = []
-        X_remain, X_test, Y_remain, Y_test = train_test_split(X, Y, test_size=0.2)
+        X_remain, X_test, Y_remain, Y_test = train_test_split(X, Y, test_size=0.3)
 
         s = 0
         for train, test in kfold.split(X_remain, Y_remain):
@@ -64,6 +63,7 @@ def model(dataset):
             feature_imp.append(featureimp.feature_importances_)
 
             print('+ Starting neural net +')
+            '''
             model = Sequential()
             model.add(Dense(100, input_dim=n_items, activation='relu', kernel_initializer='normal', use_bias=True))
             model.add(Dense(50, activation='relu', kernel_initializer='normal'))
@@ -75,19 +75,20 @@ def model(dataset):
                              verbose=0)
 
             Y_pred = model.predict_classes(X_test)
-
+            '''
             Y_pred1 = clf.predict(X_test)
             Y_pred3 = featureimp.predict(X_test)
 
-            precision_ann.append(precision_score(Y[test], Y_pred).astype(float))
-            recall_ann.append(recall_score(Y[test], Y_pred).astype(float))
-            precision_lreg.append(precision_score(Y[test], Y_pred1).astype(float))
-            recall_lreg.append(recall_score(Y[test], Y_pred1).astype(float))
-            precision_tree.append(precision_score(Y[test], Y_pred3).astype(float))
-            recall_tree.append(recall_score(Y[test], Y_pred3).astype(float))
-
-        precision_ann_var.append(np.std(precision_ann[0:10 - 1], ddof = 1))
-        recall_ann_var.append(np.std(recall_ann[0:10 - 1], ddof = 1))
+            #precision_ann.append(precision_score(Y_test, Y_pred).astype(float))
+            #recall_ann.append(recall_score(Y_test, Y_pred).astype(float))
+            precision_lreg.append(precision_score(Y_test, Y_pred1).astype(float))
+            recall_lreg.append(recall_score(Y_test, Y_pred1).astype(float))
+            precision_tree.append(precision_score(Y_test, Y_pred3).astype(float))
+            print(precision_tree)
+            recall_tree.append(recall_score(Y_test, Y_pred3).astype(float))
+            print(recall_tree)
+        #precision_ann_var.append(np.std(precision_ann[0:10 - 1], ddof = 1))
+        #recall_ann_var.append(np.std(recall_ann[0:10 - 1], ddof = 1))
         precision_lreg_var.append(np.std(precision_lreg[0:10 - 1], ddof = 1))
         recall_lreg_var.append(np.std(recall_lreg[0:10 - 1], ddof = 1))
         precision_tree_var.append(np.std(precision_tree[0:10 - 1], ddof = 1))
@@ -98,7 +99,7 @@ def model(dataset):
         print('Check', sys.exc_info()[0])
 
     print('Feature Importance',np.mean(feature_imp, axis = 0))
-    print('ANN recall/precision', np.mean(recall_ann), np.mean(precision_ann))
-    print('ANN Mean of Var K-Fold', np.mean(recall_ann_var), np.mean(precision_ann_var))
+    #print('ANN recall/precision', np.mean(recall_ann), np.mean(precision_ann))
+    #print('ANN Mean of Var K-Fold', np.mean(recall_ann_var), np.mean(precision_ann_var))
     print('ExtraTree recall/precision', np.mean(recall_tree), np.mean(precision_tree))
     print('ExtraTree Mean of Var K-Fold', np.mean(recall_tree_var), np.mean(precision_tree_var))
