@@ -7,9 +7,9 @@ from einsman_forecast import model
 description = False
 tso_filter = False
 redispatch_filter = False
-merge = True
+merge = False
 prepare_forecast_einsman = False
-forecast = False
+forecast = True
 #################
 bag = pd.read_csv('/Users/benni/Desktop/Uni/Paper/Einsman/bag.csv', low_memory = False)
 edi = pd.read_csv('/Users/benni/Desktop/Uni/Paper/Einsman/edi.csv', low_memory = False)

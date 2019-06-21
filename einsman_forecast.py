@@ -8,7 +8,7 @@ from keras.layers import Dense
 from sklearn import linear_model
 from sklearn.ensemble import ExtraTreesClassifier
 from sklearn.metrics import precision_score, recall_score
-from sklearn.model_selection import StratifiedKFold
+from sklearn.model_selection import StratifiedKFold, train_test_split
 
 feature_imp = []
 precision_ann = []
@@ -52,9 +52,10 @@ def model(dataset):
         splits = 10
         kfold = StratifiedKFold(n_splits=splits, shuffle=True, random_state=8)
         cvscores = []
+        X_remain, X_test, Y_remain, Y_test = train_test_split(X, Y, test_size=0.2)
 
         s = 0
-        for train, test in kfold.split(X, Y):
+        for train, test in kfold.split(X_remain, Y_remain):
             s = s + 1
             clf = linear_model.LogisticRegression(C=1e5, solver='lbfgs')
             clf.fit(X[train], Y[train])
@@ -73,10 +74,10 @@ def model(dataset):
             model.fit(X[train], Y[train], epochs=100, batch_size=25, validation_data=(X[test], Y[test]),
                              verbose=0)
 
-            Y_pred = model.predict_classes(X[test])
+            Y_pred = model.predict_classes(X_test)
 
-            Y_pred1 = clf.predict(X[test])
-            Y_pred3 = featureimp.predict(X[test])
+            Y_pred1 = clf.predict(X_test)
+            Y_pred3 = featureimp.predict(X_test)
 
             precision_ann.append(precision_score(Y[test], Y_pred).astype(float))
             recall_ann.append(recall_score(Y[test], Y_pred).astype(float))
